@@ -1943,18 +1943,19 @@ class Invoice_model extends CI_Model
 
 
         ## Fetch records
-        $this->db->select('po.id,AES_DECRYPT(po.sale_id,"' . $encryption_key . '") AS sale_id, 
-         si.customer_id, 
+        $this->db->select('po.id,AES_DECRYPT(po.sale_id,"' . $encryption_key . '") AS sale_id,
+         AES_DECRYPT(po.tax_invoice_id,"' . $encryption_key . '") AS tax_invoice_id,
+         si.customer_id,
            AES_DECRYPT(si.customer_name,"' . $encryption_key . '") AS customer_name ,
-         po.date, 
-         po.details, 
-          po.status, 
-         AES_DECRYPT(po.discount,"' . $encryption_key . '") AS discount, 
-         AES_DECRYPT(po.total_discount_ammount, "' . $encryption_key . '") AS total_discount_ammount, 
-         AES_DECRYPT(po.total_vat_amnt, "' . $encryption_key . '") AS total_vat_amnt, 
-         AES_DECRYPT(po.grandTotal, "' . $encryption_key . '") AS grandTotal, 
+         po.date,
+         po.details,
+          po.status,
+         AES_DECRYPT(po.discount,"' . $encryption_key . '") AS discount,
+         AES_DECRYPT(po.total_discount_ammount, "' . $encryption_key . '") AS total_discount_ammount,
+         AES_DECRYPT(po.total_vat_amnt, "' . $encryption_key . '") AS total_vat_amnt,
+         AES_DECRYPT(po.grandTotal, "' . $encryption_key . '") AS grandTotal,
          AES_DECRYPT(po.total,"' . $encryption_key . '") AS total,
-         CASE 
+         CASE
             WHEN po.incidenttype = 1 THEN \'Retail\'
             WHEN po.incidenttype = 2 THEN \'Wholesale\'
             ELSE \'\'
@@ -2028,7 +2029,8 @@ class Invoice_model extends CI_Model
             $button .= '  <a style="margin-left:7px;" href="' . $base_url . 'invoice_details/' . $record->id . '" class="btn btn-success btn-xs" data-toggle="tooltip" data-placement="left" title="' . display('invoice') . '"><i class="fa fa-window-restore" aria-hidden="true"></i></a>';
 
 
-            $link = '  <a style="margin-left:7px;" href="' . $base_url . 'invoice_details/' . $record->id . '"   >' . $record->sale_id . '</a>';
+            $invoice_no_display = !empty($record->tax_invoice_id) ? $record->tax_invoice_id : $record->sale_id;
+            $link = '  <a style="margin-left:7px;" href="' . $base_url . 'invoice_details/' . $record->id . '"   >' . $invoice_no_display . '</a>';
 
 
 

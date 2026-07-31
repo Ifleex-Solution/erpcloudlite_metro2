@@ -49,6 +49,14 @@
                                 </abbr>
                                 <?php echo $invoiceno; ?>
                             </div>
+                            <?php if (!empty($tax_invoice_id)) { ?>
+                            <div>
+                                <abbr class="font-bold">
+                                    Tax Invoice No: <span dir="ltr"></span>
+                                </abbr>
+                                <?php echo $tax_invoice_id; ?>
+                            </div>
+                            <?php } ?>
                             <div class="m-b-15">
                                 <abbr class="font-bold"><?php echo display('billing_date') ?></abbr>
                                 <?php echo date("d-M-Y", strtotime($date)); ?>

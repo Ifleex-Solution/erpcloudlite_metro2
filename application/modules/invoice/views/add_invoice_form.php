@@ -697,7 +697,16 @@
                             </div>
                         </div>
                     </div>
-              
+                    <div class="col-sm-6" id="showtaxinvoiceno" style="display:none;">
+                        <div class="form-group row">
+                            <label for="supplier_sss" class="col-sm-4 col-form-label">Tax Invoice No
+                            </label>
+                            <div class="col-sm-6">
+                                <input type="text" tabindex="2" class="form-control" value="" id="tax_invoice_no" readonly />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-sm-6">
                         <div class="form-group row">
                             <label for="supplier_sss" class="col-sm-4 col-form-label">Invoice Type
@@ -721,7 +730,7 @@
                                 <i class="text-danger">*</i>
                             </label>
                             <div class="col-sm-6">
-                                <select class="form-control" id="incidenttype" required name="incidenttype" tabindex="3">
+                                <select class="form-control" id="incidenttype" required name="incidenttype" tabindex="3" disabled>
                                     <option value=""></option>
                                     <option value="1">Retail</option>
                                     <option value="2">Wholesale</option>
@@ -1361,6 +1370,11 @@ echo "</script>";
                         document.getElementById("showorderno").style.display = "none";
                         document.getElementById("showorderno2").style.display = "block";
                         document.getElementById('sales_order_no1').value = sales[0].sales_order_no;
+
+                        if (sales[0].tax_invoice_id) {
+                            document.getElementById('tax_invoice_no').value = sales[0].tax_invoice_id;
+                            document.getElementById('showtaxinvoiceno').style.display = "block";
+                        }
 
 
                         getBranchDropdown(sales[0].branch);
