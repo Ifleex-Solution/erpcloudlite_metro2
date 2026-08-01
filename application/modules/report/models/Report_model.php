@@ -382,8 +382,8 @@ class Report_model extends CI_Model
         $sql1 = "
    SELECT 
         a.date,
-        AES_DECRYPT(a.sale_id,'$encryption_key') AS invoiceno,
-        CASE 
+        AES_DECRYPT(a.tax_invoice_id,'$encryption_key') AS invoiceno,
+        CASE
         WHEN a.incidenttype = 1 THEN 'Retail'
         ELSE 'Wholesale'
     END AS incidenttype,
@@ -419,7 +419,7 @@ class Report_model extends CI_Model
         $sql2 = "
         SELECT 
             a.rdate AS date,
-            AES_DECRYPT(s.sale_id,'$encryption_key') AS invoiceno,
+            AES_DECRYPT(s.tax_invoice_id,'$encryption_key') AS invoiceno,
             'Sales Return' AS incidenttype,
             AES_DECRYPT(b.customer_name,'$encryption_key') AS customer_name,
            - AES_DECRYPT(a.grandTotal,'$encryption_key') AS total
@@ -1218,8 +1218,8 @@ ORDER BY quantity DESC
 SELECT 
     b.product_name,
     c.date,
-    AES_DECRYPT(c.sale_id,'$encryption_key') AS sale_id,
-    CASE 
+    AES_DECRYPT(c.tax_invoice_id,'$encryption_key') AS sale_id,
+    CASE
         WHEN c.incidenttype = 1 THEN 'Retail'
         ELSE 'Wholesale'
     END AS incidenttype,
@@ -1274,7 +1274,7 @@ AND c.date <= '$to_date'
 SELECT 
     b.product_name,
     c.rdate AS date,
-    AES_DECRYPT(s.sale_id,'$encryption_key') AS sale_id,
+    AES_DECRYPT(s.tax_invoice_id,'$encryption_key') AS sale_id,
      'Sales Return' AS incidenttype,
     AES_DECRYPT(a.product_rate,'$encryption_key') AS product_rate,
    - AES_DECRYPT(a.total_price,'$encryption_key') AS total,
@@ -1665,7 +1665,7 @@ ORDER BY quantity DESC
                 GROUP BY sd.pid
             )
             SELECT
-                AES_DECRYPT(s.sale_id,        '$encryption_key')                              AS sale_id,
+                AES_DECRYPT(s.tax_invoice_id,  '$encryption_key')                              AS sale_id,
                 s.date                                                                         AS sale_date,
                 ROUND(AES_DECRYPT(s.grandTotal, '$encryption_key'), 2)                        AS grand_total,
                 ROUND(sc.cost, 2)                                                              AS cost,
@@ -1760,7 +1760,7 @@ ORDER BY quantity DESC
             $branchids = array_column($branchResult, 'id');
         }
 
-        $this->db->select("a.rdate as date,AES_DECRYPT(a.sales_return_id,'" . $encryption_key . "') AS return_id,AES_DECRYPT(b.sale_id,'" . $encryption_key . "') AS invoiceno,AES_DECRYPT(c.customer_name,'" . $encryption_key . "') AS customer_name,AES_DECRYPT(a.grandTotal,'" . $encryption_key . "') AS total");
+        $this->db->select("a.rdate as date,AES_DECRYPT(a.sales_return_id,'" . $encryption_key . "') AS return_id,AES_DECRYPT(b.tax_invoice_id,'" . $encryption_key . "') AS invoiceno,AES_DECRYPT(c.customer_name,'" . $encryption_key . "') AS customer_name,AES_DECRYPT(a.grandTotal,'" . $encryption_key . "') AS total");
         $this->db->from('sales_return a');
         $this->db->join('sale b', 'b.id = a.sales_id', 'left');
         $this->db->join('customer_information c', 'c.customer_id = a.customer_id', 'left');
@@ -2035,7 +2035,7 @@ ORDER BY quantity DESC
             AES_DECRYPT(ds.gdn_id,'$encryption_key') AS gdn_id,
             ds.date,
             CASE
-                WHEN ds.type IN ('sale','wholesale') THEN AES_DECRYPT(p.sale_id,'$encryption_key')
+                WHEN ds.type IN ('sale','wholesale') THEN AES_DECRYPT(p.tax_invoice_id,'$encryption_key')
                 WHEN ds.type = 'purchasereturn'      THEN AES_DECRYPT(pr.purchase_return_id,'$encryption_key')
                 ELSE ''
             END AS voucherno,

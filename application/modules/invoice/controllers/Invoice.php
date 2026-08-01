@@ -2293,6 +2293,7 @@ class Invoice extends MX_Controller
         date_default_timezone_set('Asia/Colombo');
 
         $num = $this->number_generatorsales($this->input->post('type2', TRUE));
+        $tax_invoice_id = $this->generate_tax_invoice_id($this->input->post('branch', TRUE), $this->input->post('date', TRUE), $this->input->post('type2', TRUE));
         $lastupdate = date('Y-m-d H:i:s');
 
         $sales_order_no = 0;
@@ -2309,11 +2310,11 @@ class Invoice extends MX_Controller
 
 
         $query = "
-    INSERT INTO sale 
-    (id,sale_id, date, details, type2, discount, total_discount_ammount, total_vat_amnt, grandTotal, total,customer_id,employee_id,payment_type,lastupdateddate,createddate,userid,
-    incidenttype,already,branch,invoicetype,sales_order_no) 
-    VALUES 
-    (0,AES_ENCRYPT('{$num}', '{$encryption_key}') , 
+    INSERT INTO sale
+    (id,sale_id,tax_invoice_id, date, details, type2, discount, total_discount_ammount, total_vat_amnt, grandTotal, total,customer_id,employee_id,payment_type,lastupdateddate,createddate,userid,
+    incidenttype,already,branch,invoicetype,sales_order_no)
+    VALUES
+    (0,AES_ENCRYPT('{$num}', '{$encryption_key}'), AES_ENCRYPT('{$tax_invoice_id}', '{$encryption_key}'),
      '{$this->input->post('date', TRUE)}',
      '{$this->input->post('details', TRUE)}',  
      AES_ENCRYPT('{$this->input->post('type2', TRUE)}', '{$encryption_key}'), 
@@ -2369,7 +2370,7 @@ class Invoice extends MX_Controller
                     'sale',
                        " . $this->db->escape($incidentType) . ",
                     AES_ENCRYPT('', '{$encryption_key}'),
-                AES_ENCRYPT(" . $this->db->escape((string)$num) . ", '{$encryption_key}'),
+                AES_ENCRYPT(" . $this->db->escape((string)$tax_invoice_id) . ", '{$encryption_key}'),
                     " . $this->db->escape($inserted_id) . ",
                     " . $this->db->escape($item['store']) . ",
                     AES_ENCRYPT(" . $this->db->escape('' . $item['aqty']) . ", '{$encryption_key}'),
@@ -2420,7 +2421,7 @@ class Invoice extends MX_Controller
                      'sale',
                       " . $this->db->escape($incidentType) . ",
                     AES_ENCRYPT('', '{$encryption_key}'),
-                   AES_ENCRYPT(" . $this->db->escape((string)$num) . ", '{$encryption_key}'),
+                   AES_ENCRYPT(" . $this->db->escape((string)$tax_invoice_id) . ", '{$encryption_key}'),
                     " . $this->db->escape($inserted_id) . ",
                     " . $this->db->escape($item['store']) . ",
                     AES_ENCRYPT('', '{$encryption_key}'),
@@ -2530,16 +2531,27 @@ class Invoice extends MX_Controller
             'date'    => $this->input->post('date', TRUE),
             'details'    => $this->input->post('details', TRUE),
             'invoiceno' => $num,
+            'tax_invoice_id' => $tax_invoice_id,
             'payment' => $this->input->post('payment', TRUE)
         );
 
-        $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
         $data['users_name']  = $this->session->userdata('fullname');
         $data['terms_list']  = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
-        $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
-        $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+
+        $branch = (int) $this->input->post('branch', TRUE);
+        if ($branch === 1 || $branch === 2) {
+            $print_view = ($branch === 1) ? 'invoice/metro_print1' : 'invoice/metro_print2';
+            $data['total23']    = $data['total'];
+            $data['details1']   = $data['details'];
+            $data['tinno']      = $customer_info->email_address;
+            $data['print_type'] = 'metro';
+        } else {
+            $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
+            $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
+            $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+            $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
+        }
         $data['details']    = $this->load->view($print_view, $data, true);
-        $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
 
         echo json_encode($data);
     }
@@ -2739,7 +2751,7 @@ class Invoice extends MX_Controller
 
         $encryption_key = Config::$encryption_key;
 
-        $num = $this->number_generatorsalesorder($this->input->post('type2', TRUE));
+        $num = $this->number_generatorsalesorder($this->input->post('type2', TRUE), $this->input->post('branch', TRUE));
         $lastupdate = date('Y-m-d H:i:s');
 
         $query = "
@@ -2910,6 +2922,45 @@ class Invoice extends MX_Controller
     }
 
 
+    public function generate_tax_invoice_id($branch, $sale_date, $type2 = null)
+    {
+        $encryption_key = Config::$encryption_key;
+        $branch = (int) $branch;
+
+        $this->db->select_max("CAST(SUBSTRING_INDEX(AES_DECRYPT(tax_invoice_id,'" . $encryption_key . "'), '_', -1) AS UNSIGNED)", 'seq');
+        $this->db->where('branch', $branch);
+        $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", $type2);
+        $result  = $this->db->get('sale')->result_array();
+        $raw_max = $result[0]['seq'];
+
+        // Branch 3 is the wholesale branch — running sequence starting at 500000001.
+        // Live saves get the plain number; testing-environment saves get it Test_-prefixed,
+        // counted in its own separate space so test saves never touch the live sequence
+        if ($branch === 3) {
+            $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : 500000001;
+            return ($type2 === 'B') ? ('Test_' . $next_seq) : (string) $next_seq;
+        }
+
+        // type2 = 'B' is the testing environment — its own numbering scheme, kept
+        // in a separate counting space so test saves never touch the live sequence
+        if ($type2 === 'B') {
+            $prev_seq = 0;
+            if ($raw_max !== null && $raw_max !== '') {
+                $prev_seq = (int) substr((string) $raw_max, strlen((string) $branch));
+            }
+            $next_seq = $prev_seq + 1;
+
+            return 'Test_' . $branch . str_pad($next_seq, 8, '0', STR_PAD_LEFT);
+        }
+
+        $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : 1;
+
+        $branch_code = sprintf('BR%02d', $branch);
+        $date_part   = strtoupper(date('YM', strtotime($sale_date)));
+
+        return $date_part . '_' . $branch_code . '_' . $next_seq;
+    }
+
     public function number_generatorsales($type = null)
     {
         $encryption_key = Config::$encryption_key;
@@ -2952,22 +3003,23 @@ class Invoice extends MX_Controller
         return $invoice_no;
     }
 
-    public function number_generatorsalesorder($type = null)
+    public function number_generatorsalesorder($type = null, $branch = null)
     {
         $encryption_key = Config::$encryption_key;
+        $branch = (int) $branch;
 
-        $this->db->select_max("AES_DECRYPT(sale_id,'" . $encryption_key . "')", 'id');
-        // $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", $type);
-        $query      = $this->db->get('sales_order');
-        $result     = $query->result_array();
-        $invoice_no = $result[0]['id'];
-        if ($invoice_no != '') {
-            $invoice_no = $invoice_no + 1;
+        $this->db->select_max("CAST(SUBSTRING_INDEX(AES_DECRYPT(sale_id,'" . $encryption_key . "'), '_', -1) AS UNSIGNED)", 'seq');
+        $this->db->where('branch', $branch);
+        $query  = $this->db->get('sales_order');
+        $result = $query->result_array();
+        $seq    = $result[0]['seq'];
+        if ($seq !== null && $seq !== '') {
+            $next_seq = (int) $seq + 1;
         } else {
-            $invoice_no = 1000000001;
-
+            // Branch 1 starts at 1000000001, branch 2 at 2000000001, etc.
+            $next_seq = ($branch * 1000000000) + 1;
         }
-        return $invoice_no;
+        return 'Quot_' . $next_seq;
     }
     public function checksales()
     {
@@ -2990,11 +3042,12 @@ class Invoice extends MX_Controller
         $encryption_key = Config::$encryption_key;
 
         $this->db->select("
-         po.id, 
+         po.id,
          pod.id as invoice_detail_id,
          si.customer_id,
-         po.date, 
-           po.branch, 
+         po.date,
+         AES_DECRYPT(po.tax_invoice_id, '" . $encryption_key . "') AS tax_invoice_id,
+           po.branch,
          po.details, pi.product_name,
  po.payment_type, pi.stock,
           po.incidenttype,                    po.employee_id, 
@@ -3156,7 +3209,8 @@ class Invoice extends MX_Controller
         WHERE pod.product = c.product
           AND pod.store = c.store 
           AND pod.batch = c.batch 
-    ) AS avstock,pi.batchtype,po.invoicetype,AES_DECRYPT(sod.sale_id, '{$encryption_key}') as sale_id 
+    ) AS avstock,pi.batchtype,po.invoicetype,AES_DECRYPT(sod.sale_id, '{$encryption_key}') as sale_id
+     ,AES_DECRYPT(sod.tax_invoice_id, '{$encryption_key}') as tax_invoice_id
      ,AES_DECRYPT(pod.rdeduction, '{$encryption_key}') as rdeduction  ");
         $this->db->from('sales_return po');
         $this->db->join('customer_information si', 'si.customer_id = po.customer_id', 'inner');
@@ -3394,7 +3448,7 @@ CAST( ROUND(    CASE
             'sale',
              " . $this->db->escape($incidentType) . ",
             AES_ENCRYPT('', '{$encryption_key}'),
-          (SELECT sale_id FROM sale WHERE id = " . $this->db->escape($this->input->post('id', TRUE)) . " LIMIT 1),
+          (SELECT tax_invoice_id FROM sale WHERE id = " . $this->db->escape($this->input->post('id', TRUE)) . " LIMIT 1),
             " . $this->db->escape($this->input->post('id', TRUE)) . ",
            " . $this->db->escape($item['store']) . ",
           AES_ENCRYPT(" . $this->db->escape('' . $item['aqty']) . ", '{$encryption_key}'),
@@ -3440,7 +3494,7 @@ CAST( ROUND(    CASE
                  'sale',
                   " . $this->db->escape($incidentType) . ",
                 AES_ENCRYPT('', '{$encryption_key}'),
-          (SELECT sale_id FROM sale WHERE id = " . $this->db->escape($this->input->post('id', TRUE)) . " LIMIT 1),
+          (SELECT tax_invoice_id FROM sale WHERE id = " . $this->db->escape($this->input->post('id', TRUE)) . " LIMIT 1),
             " . $this->db->escape($this->input->post('id', TRUE)) . ",
                 " . $this->db->escape($item['store']) . ",
                 AES_ENCRYPT('', '{$encryption_key}'),
@@ -3581,16 +3635,27 @@ WHERE id = '{$item['invoicedetail']}'
             'date'    => $this->input->post('date', TRUE),
             'details'    => $this->input->post('details', TRUE),
             'invoiceno' => $invoiceno[0]['sale_id'],
+            'tax_invoice_id' => $invoiceno[0]['tax_invoice_id'],
             'payment' => $this->input->post('payment', TRUE)
         );
 
-        $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
         $data['users_name']  = $this->session->userdata('fullname');
         $data['terms_list']  = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
-        $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
-        $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+
+        $branch = (int) $this->input->post('branch', TRUE);
+        if ($branch === 1 || $branch === 2) {
+            $print_view = ($branch === 1) ? 'invoice/metro_print1' : 'invoice/metro_print2';
+            $data['total23']    = $data['total'];
+            $data['details1']   = $data['details'];
+            $data['tinno']      = $customer_info->email_address;
+            $data['print_type'] = 'metro';
+        } else {
+            $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
+            $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
+            $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+            $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
+        }
         $data['details']    = $this->load->view($print_view, $data, true);
-        $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
 
         echo json_encode($data);
     }
@@ -3970,7 +4035,7 @@ WHERE id = '{$item['invoicedetail']}'
     {
         $encryption_key = Config::$encryption_key;
 
-        return $result = $this->db->select(" AES_DECRYPT(sale_id, '" . $encryption_key . "') AS sale_id")
+        return $result = $this->db->select(" AES_DECRYPT(sale_id, '" . $encryption_key . "') AS sale_id, AES_DECRYPT(tax_invoice_id, '" . $encryption_key . "') AS tax_invoice_id")
             ->from('sale')
             ->where('id', $id)
             ->get()
@@ -4270,16 +4335,27 @@ WHERE id = '{$item['invoicedetail']}'
             'date'    =>  $sale[0]['date'],
             'details'    => "",
             'invoiceno' => $sale[0]['sale_id'],
+            'tax_invoice_id' => $sale[0]['tax_invoice_id'],
             'payment' => ""
         );
 
-        $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
         $data['users_name']  = $this->session->userdata('fullname');
         $data['terms_list']  = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
-        $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
-        $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+
+        $branch = (int) $sale[0]['branch'];
+        if ($branch === 1 || $branch === 2) {
+            $print_view = ($branch === 1) ? 'invoice/metro_print1' : 'invoice/metro_print2';
+            $data['total23']    = $data['total'];
+            $data['details1']   = $data['details'];
+            $data['tinno']      = $customer_info->email_address;
+            $data['print_type'] = 'metro';
+        } else {
+            $ws = $this->db->select('pos_print_type')->from('web_setting')->get()->row();
+            $ptype = !empty($ws) ? (int)$ws->pos_print_type : 0;
+            $print_view = ($ptype === 1) ? 'invoice/pos_thermal_print' : (($ptype === 2) ? 'invoice/pos_print_dotmatrix' : 'invoice/pos_print');
+            $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
+        }
         $data['details']    = $this->load->view($print_view, $data, true);
-        $data['print_type'] = ($ptype === 1) ? 'thermal' : (($ptype === 2) ? 'dotmatrix' : 'normal');
 
         echo json_encode($data);
     }
@@ -4328,11 +4404,12 @@ WHERE id = '{$item['invoicedetail']}'
         $encryption_key = Config::$encryption_key;
 
         return $result = $this->db->select("AES_DECRYPT(sale_id, '" . $encryption_key . "') AS sale_id,
+         AES_DECRYPT(tax_invoice_id, '" . $encryption_key . "') AS tax_invoice_id,
          AES_DECRYPT(total, '" . $encryption_key . "') AS total,
          AES_DECRYPT(discount, '" . $encryption_key . "') AS discount,
           AES_DECRYPT(total_discount_ammount, '" . $encryption_key . "') AS total_discount_ammount,
          AES_DECRYPT(total_vat_amnt, '" . $encryption_key . "') AS total_vat_amnt,customer_id,
-            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date,details ")
+            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date,details,branch ")
             ->from('sale')
             ->where('id', $id)
             ->get()
@@ -4602,7 +4679,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
 
         $encryption_key = Config::$encryption_key;
 
-        $num = $this->number_generatquotations($this->input->post('type2', TRUE));
+        $num = $this->number_generatquotations($this->input->post('type2', TRUE), $this->input->post('branch', TRUE));
         $lastupdate = date('Y-m-d H:i:s');
 
         $query = "
@@ -4706,25 +4783,23 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
         echo json_encode($data);
     }
 
-    public function number_generatquotations($type = null)
+    public function number_generatquotations($type = null, $branch = null)
     {
         $encryption_key = Config::$encryption_key;
+        $branch = (int) $branch;
 
-        $this->db->select_max("AES_DECRYPT(quotation_id,'" . $encryption_key . "')", 'id');
-        $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", $type);
-        $query      = $this->db->get('quotation');
-        $result     = $query->result_array();
-        $invoice_no = $result[0]['id'];
-        if ($invoice_no != '') {
-            $invoice_no = $invoice_no + 1;
+        $this->db->select_max("CAST(SUBSTRING_INDEX(AES_DECRYPT(quotation_id,'" . $encryption_key . "'), '_', -1) AS UNSIGNED)", 'seq');
+        $this->db->where('branch', $branch);
+        $query  = $this->db->get('quotation');
+        $result = $query->result_array();
+        $seq    = $result[0]['seq'];
+        if ($seq !== null && $seq !== '') {
+            $next_seq = (int) $seq + 1;
         } else {
-            if ($type == "A") {
-                $invoice_no = 1000000000;
-            } else {
-                $invoice_no = 3000000000;
-            }
+            // Branch 1 starts at 1000000001, branch 2 at 2000000001, etc.
+            $next_seq = ($branch * 1000000000) + 1;
         }
-        return $invoice_no;
+        return 'Quot_' . $next_seq;
     }
 
     public function getsalesorderidbybranch()
@@ -4771,7 +4846,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
     {
         $encryption_key = Config::$encryption_key;
 
-        $salesorder_result = $this->db->select("id,AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_id")
+        $salesorder_result = $this->db->select("id,AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_id,AES_DECRYPT(s.tax_invoice_id, '{$encryption_key}') AS tax_invoice_id")
             ->from('sale s')
             ->where("AES_DECRYPT(s.type2,'" . $encryption_key . "')", $this->input->post('type2', TRUE))
             ->where("s.branch", $this->input->post('branch', TRUE))
@@ -5511,12 +5586,14 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
          $encryption_key = Config::$encryption_key;
 
          $query = "
-                INSERT INTO customer_information 
-                (customer_id, customer_name, customer_mobile,status) 
-                VALUES 
+                INSERT INTO customer_information
+                (customer_id, customer_name, customer_mobile, customer_address, email_address, status)
+                VALUES
                 ('0',
                  AES_ENCRYPT('{$this->input->post('customer_name', TRUE)}', '{$encryption_key}'),
-                 AES_ENCRYPT('{$this->input->post('customer_phone', TRUE)}', '{$encryption_key}'),1
+                 AES_ENCRYPT('{$this->input->post('customer_phone', TRUE)}', '{$encryption_key}'),
+                 AES_ENCRYPT('{$this->input->post('customer_address', TRUE)}', '{$encryption_key}'),
+                 AES_ENCRYPT('{$this->input->post('customer_tin', TRUE)}', '{$encryption_key}'),1
                 );";
 
           $this->db->query($query);
@@ -5544,7 +5621,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
             AES_DECRYPT(sr.total_vat_amnt, '{$encryption_key}') AS total_vat_amnt,
             AES_DECRYPT(sr.grandTotal, '{$encryption_key}') AS grandTotal,
             AES_DECRYPT(sr.total, '{$encryption_key}') AS total,
-            AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_invoice_no
+            AES_DECRYPT(s.tax_invoice_id, '{$encryption_key}') AS sale_invoice_no
         ")
         ->from('sales_return sr')
         ->join('sale s', 's.id = sr.sales_id', 'left')
