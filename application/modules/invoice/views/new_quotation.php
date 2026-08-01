@@ -979,6 +979,16 @@
 					<input type="text" required tabindex="2" class="form-control" name="customer_phone" value="" id="customer_phone" />
 				</div>
 
+				<div class="form-group">
+					<label>Customer Address</label>
+					<input type="text" tabindex="2" class="form-control" name="customer_address" value="" id="customer_address" />
+				</div>
+
+				<div class="form-group">
+					<label>Customer TIN</label>
+					<input type="text" tabindex="2" class="form-control" name="customer_tin" value="" id="customer_tin" />
+				</div>
+
 
 			</div>
 
@@ -1256,6 +1266,8 @@ echo "</script>";
                 data: {
                     customer_name: document.getElementById('customer_name').value,
                    customer_phone: document.getElementById('customer_phone').value,
+                   customer_address: document.getElementById('customer_address').value,
+                   customer_tin: document.getElementById('customer_tin').value,
                 },
                 success: function(response) {
                      var customer_new = JSON.parse(response);
@@ -1272,6 +1284,8 @@ echo "</script>";
                     $('#customerModel').modal('hide');
                     document.getElementById('customer_name').value=""
                     document.getElementById('customer_phone').value=""
+                    document.getElementById('customer_address').value=""
+                    document.getElementById('customer_tin').value=""
                     
 
 

@@ -399,6 +399,11 @@
                                     <?php } ?>
                                 </select>
                             </div>
+                            <div class="col-sm-1">
+                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#customerModel">
+                                    <i class="fa fa-user-plus"></i>
+                                </button>
+                            </div>
 
                         </div>
                     </div>
@@ -453,7 +458,7 @@
                                         class="text-danger">*</i></th>
                                 <th class="text-center ">Return Store<i
                                         class="text-danger">*</i></th>
-                                <th class="text-center ">Deduction%<i
+                                <th class="text-center ">Deduction Amt<i
                                         class="text-danger">*</i></th>
 
 
@@ -747,6 +752,54 @@
     </div>
 </div>
 
+<div id="customerModel" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add New Customer</h4>
+            </div>
+
+            <div class="modal-body">
+
+
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" required tabindex="2" class="form-control" name="customer_name" value="" id="customer_name" />
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" required tabindex="2" class="form-control" name="customer_phone" value="" id="customer_phone" />
+                </div>
+
+                <div class="form-group">
+                    <label>Customer Address</label>
+                    <input type="text" tabindex="2" class="form-control" name="customer_address" value="" id="customer_address" />
+                </div>
+
+                <div class="form-group">
+                    <label>Customer TIN</label>
+                    <input type="text" tabindex="2" class="form-control" name="customer_tin" value="" id="customer_tin" />
+                </div>
+
+
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="save_customer()">Save</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
 <?php
 echo "<script>";
 echo "let id = " . json_encode($id) . ";";
@@ -926,6 +979,42 @@ echo "</script>";
         }
     });
 
+    function save_customer() {
+
+        $.ajax({
+            url: $('#base_url').val() + 'invoice/invoice/save_customer',
+            type: 'POST',
+            data: {
+                customer_name: document.getElementById('customer_name').value,
+                customer_phone: document.getElementById('customer_phone').value,
+                customer_address: document.getElementById('customer_address').value,
+                customer_tin: document.getElementById('customer_tin').value,
+            },
+            success: function(response) {
+                var customer_new = JSON.parse(response);
+                customers = customer_new.all_customer;
+
+                var $customerDropdown = $('#customer_id');
+                $customerDropdown.empty();
+                $customerDropdown.append('<option value="" disabled selected>Select Customer</option>'); // Add default option
+                $.each(customers, function(index, customer) {
+                    $customerDropdown.append('<option value="' + customer.customer_id + '">' + customer.customer_name + '</option>');
+                });
+                $customerDropdown.val(customer_new.inserted_id)
+                alert("Customer Information saved sucessfully")
+                $('#customerModel').modal('hide');
+                document.getElementById('customer_name').value = ""
+                document.getElementById('customer_phone').value = ""
+                document.getElementById('customer_address').value = ""
+                document.getElementById('customer_tin').value = ""
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+
+    }
+
     function getSalesOrderDetails() {
         $.ajax({
             url: $('#base_url').val() + 'invoice/invoice/getSaleById',
@@ -1035,7 +1124,7 @@ echo "</script>";
                     document.getElementById('total_price' + a).value = sales[i].total_price;
                     document.getElementById('total_discount' + a).value = sales[i].total_discount;
                     document.getElementById('all_discount' + a).value = sales[i].all_discount;
-                    document.getElementById('rdeduction' + a).value = 100;
+                    document.getElementById('rdeduction' + a).value = 0;
 
                     getActiveSubUnitEdit(sales[i].product, a, sales[i].unit, sales[i].conversion_id,
                         sales[i].conversion_ratio, sales[i].convertiontype,
@@ -1357,10 +1446,7 @@ echo "</script>";
         var quantity = $("#rqty" + sl).val();
         var discount = $("#discount" + sl).val();
         if (!$("#rdeduction" + sl).val()) {
-            $("#rdeduction" + sl).val(100)
-        }
-        if ($("#rdeduction" + sl).val() > 100) {
-            $("#rdeduction" + sl).val(100)
+            $("#rdeduction" + sl).val(0)
         }
         var rdeduction = $("#rdeduction" + sl).val();
 
@@ -1396,13 +1482,6 @@ echo "</script>";
                 // product wise vat start
                 var vat = +(temp * vat_percent / 100);
                 $("#vat_value" + sl).val(vat);
-                if (rdeduction && quantity > 0) {
-                    let vat1 = $("#vat_value" + sl).val();
-                    var vat1rdeductionval = +(vat1 * rdeduction / 100);
-                    $("#vat_value" + sl).val(vat1rdeductionval);
-
-
-                }
                 // product wise vat end
                 var ttletax = 0;
                 $("#total_price" + sl).val(temp);
@@ -1452,15 +1531,19 @@ echo "</script>";
         }
 
 
-        if (rdeduction && quantity > 0) {
-            let price1 = $("#total_price" + sl).val();
-            var rdeductionval = +(price1 * rdeduction / 100);
-            var temp = price1 - rdeductionval;
-            $("#total_price" + sl).val(rdeductionval);
+        if (quantity > 0) {
+            let price1 = parseFloat($("#total_price" + sl).val()) || 0;
+            let deductionAmt = parseFloat(rdeduction) || 0;
+            let afterDeduction = price1 - deductionAmt;
+            if (afterDeduction < 0) afterDeduction = 0;
+            $("#total_price" + sl).val(afterDeduction);
 
+            let vatAfterDeduction = +(afterDeduction * vat_percent / 100);
+            $("#vat_value" + sl).val(vatAfterDeduction);
 
         }else{
             $("#total_price" + sl).val(0);
+            $("#vat_value" + sl).val(0);
 
         }
 
@@ -2171,7 +2254,7 @@ echo "</script>";
 
     /* ── Mobile card labels ── */
     (function () {
-        var colLabels = ['Product','Store','Batch','Unit','Av.Qty','Qty','Ret.Qty','Ret.Store','Deduction%','VAT','Total'];
+        var colLabels = ['Product','Store','Batch','Unit','Av.Qty','Qty','Ret.Qty','Ret.Store','Deduction Amt','VAT','Total'];
         document.querySelectorAll('#saleTable tbody tr').forEach(function (row) {
             row.querySelectorAll('td').forEach(function (td, i) {
                 if (!colLabels[i]) return;

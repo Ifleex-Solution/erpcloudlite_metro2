@@ -1428,9 +1428,7 @@ class Report extends MX_Controller
 
     public function header($pdf, $page, $head, $type, $from, $to)
     {
-        $company_info     = $this->company_info();
-        $currency_details = $this->service_model->web_setting();
-
+       
         $pageWidth = $pdf->GetPageWidth();
         $margins   = $pdf->getMargins();
         $lMargin   = $margins['left'];
@@ -1441,33 +1439,7 @@ class Report extends MX_Controller
         $curY = 7;
         $lineH = 6;
 
-        // Logo — left aligned, only if file exists
-        $logoRelPath = $currency_details[0]['invoice_logo'] ?? '';
-        $logoFile    = FCPATH . ltrim($logoRelPath, '/');
-        if (!empty($logoRelPath) && file_exists($logoFile)) {
-            $logoW = 28;
-            $pdf->Image(base_url() . $logoRelPath, $lMargin, $curY, $logoW, 13, '', '', '', true, 150, '', false, false, 0, false, false, false);
-        }
-
-        // Company name
-        $pdf->SetFont('helvetica', 'B', 13);
-        $pdf->SetXY($lMargin, $curY);
-        $pdf->Cell($contentW, $lineH, $company_info[0]['company_name'], 0, 1, 'C');
-        $curY += $lineH;
-
-        // Address | Mobile | Email — skip empty parts
-        $parts = array_filter([
-            trim($company_info[0]['address'] ?? ''),
-            trim($company_info[0]['mobile']  ?? ''),
-            trim($company_info[0]['email']   ?? ''),
-        ]);
-        if ($parts) {
-            $pdf->SetFont('helvetica', '', 8);
-            $pdf->SetXY($lMargin, $curY);
-            $pdf->Cell($contentW, $lineH, implode('   |   ', $parts), 0, 1, 'C');
-            $curY += $lineH;
-        }
-
+        
         // Report title
         $pdf->SetFont('helvetica', 'B', 11);
         $pdf->SetXY($lMargin, $curY);

@@ -5585,12 +5585,14 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
          $encryption_key = Config::$encryption_key;
 
          $query = "
-                INSERT INTO customer_information 
-                (customer_id, customer_name, customer_mobile,status) 
-                VALUES 
+                INSERT INTO customer_information
+                (customer_id, customer_name, customer_mobile, customer_address, email_address, status)
+                VALUES
                 ('0',
                  AES_ENCRYPT('{$this->input->post('customer_name', TRUE)}', '{$encryption_key}'),
-                 AES_ENCRYPT('{$this->input->post('customer_phone', TRUE)}', '{$encryption_key}'),1
+                 AES_ENCRYPT('{$this->input->post('customer_phone', TRUE)}', '{$encryption_key}'),
+                 AES_ENCRYPT('{$this->input->post('customer_address', TRUE)}', '{$encryption_key}'),
+                 AES_ENCRYPT('{$this->input->post('customer_tin', TRUE)}', '{$encryption_key}'),1
                 );";
 
           $this->db->query($query);
