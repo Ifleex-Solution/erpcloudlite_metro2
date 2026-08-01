@@ -2751,7 +2751,7 @@ class Invoice extends MX_Controller
 
         $encryption_key = Config::$encryption_key;
 
-        $num = $this->number_generatorsalesorder($this->input->post('type2', TRUE));
+        $num = $this->number_generatorsalesorder($this->input->post('type2', TRUE), $this->input->post('branch', TRUE));
         $lastupdate = date('Y-m-d H:i:s');
 
         $query = "
@@ -2933,11 +2933,12 @@ class Invoice extends MX_Controller
         $result  = $this->db->get('sale')->result_array();
         $raw_max = $result[0]['seq'];
 
-        // Branch 3 is the wholesale branch — plain running sequence starting at
-        // 500000001, same scheme whether it's a live or testing-environment save
+        // Branch 3 is the wholesale branch — running sequence starting at 500000001.
+        // Live saves get the plain number; testing-environment saves get it Test_-prefixed,
+        // counted in its own separate space so test saves never touch the live sequence
         if ($branch === 3) {
             $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : 500000001;
-            return (string) $next_seq;
+            return ($type2 === 'B') ? ('Test_' . $next_seq) : (string) $next_seq;
         }
 
         // type2 = 'B' is the testing environment — its own numbering scheme, kept
@@ -3002,22 +3003,23 @@ class Invoice extends MX_Controller
         return $invoice_no;
     }
 
-    public function number_generatorsalesorder($type = null)
+    public function number_generatorsalesorder($type = null, $branch = null)
     {
         $encryption_key = Config::$encryption_key;
+        $branch = (int) $branch;
 
-        $this->db->select_max("AES_DECRYPT(sale_id,'" . $encryption_key . "')", 'id');
-        // $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", $type);
-        $query      = $this->db->get('sales_order');
-        $result     = $query->result_array();
-        $invoice_no = $result[0]['id'];
-        if ($invoice_no != '') {
-            $invoice_no = $invoice_no + 1;
+        $this->db->select_max("CAST(SUBSTRING_INDEX(AES_DECRYPT(sale_id,'" . $encryption_key . "'), '_', -1) AS UNSIGNED)", 'seq');
+        $this->db->where('branch', $branch);
+        $query  = $this->db->get('sales_order');
+        $result = $query->result_array();
+        $seq    = $result[0]['seq'];
+        if ($seq !== null && $seq !== '') {
+            $next_seq = (int) $seq + 1;
         } else {
-            $invoice_no = 1000000001;
-
+            // Branch 1 starts at 1000000001, branch 2 at 2000000001, etc.
+            $next_seq = ($branch * 1000000000) + 1;
         }
-        return $invoice_no;
+        return 'Quot_' . $next_seq;
     }
     public function checksales()
     {
@@ -4676,7 +4678,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
 
         $encryption_key = Config::$encryption_key;
 
-        $num = $this->number_generatquotations($this->input->post('type2', TRUE));
+        $num = $this->number_generatquotations($this->input->post('type2', TRUE), $this->input->post('branch', TRUE));
         $lastupdate = date('Y-m-d H:i:s');
 
         $query = "
@@ -4780,25 +4782,23 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
         echo json_encode($data);
     }
 
-    public function number_generatquotations($type = null)
+    public function number_generatquotations($type = null, $branch = null)
     {
         $encryption_key = Config::$encryption_key;
+        $branch = (int) $branch;
 
-        $this->db->select_max("AES_DECRYPT(quotation_id,'" . $encryption_key . "')", 'id');
-        $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", $type);
-        $query      = $this->db->get('quotation');
-        $result     = $query->result_array();
-        $invoice_no = $result[0]['id'];
-        if ($invoice_no != '') {
-            $invoice_no = $invoice_no + 1;
+        $this->db->select_max("CAST(SUBSTRING_INDEX(AES_DECRYPT(quotation_id,'" . $encryption_key . "'), '_', -1) AS UNSIGNED)", 'seq');
+        $this->db->where('branch', $branch);
+        $query  = $this->db->get('quotation');
+        $result = $query->result_array();
+        $seq    = $result[0]['seq'];
+        if ($seq !== null && $seq !== '') {
+            $next_seq = (int) $seq + 1;
         } else {
-            if ($type == "A") {
-                $invoice_no = 1000000000;
-            } else {
-                $invoice_no = 3000000000;
-            }
+            // Branch 1 starts at 1000000001, branch 2 at 2000000001, etc.
+            $next_seq = ($branch * 1000000000) + 1;
         }
-        return $invoice_no;
+        return 'Quot_' . $next_seq;
     }
 
     public function getsalesorderidbybranch()

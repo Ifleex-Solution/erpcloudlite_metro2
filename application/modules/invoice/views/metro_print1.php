@@ -1,5 +1,16 @@
 <div class="metro-print-wrapper">
 <style>
+    @page {
+        size: 6in 8in;
+        margin: 0;
+    }
+
+    .metro-print-wrapper {
+        width: 6in;
+        min-height: 8in;
+        box-sizing: border-box;
+    }
+
     @media print {
         button {
             display: none;
@@ -39,7 +50,7 @@
 
     .fixed-width1 {
         display: inline-block;
-        width: 220px;
+        width: 270px;
         height: 15px;
         overflow: hidden;
         /* text-overflow: ellipsis; */
@@ -181,7 +192,7 @@
 
 
 <!-- <span style="margin-top: 100x;"> -->
-<table style="display: inline-table;margin-top:26px; margin-left: 10px;border-collapse:collapse;vertical-align: top;">
+<table style="display: inline-table;margin-top:32px; margin-left: 10px;border-collapse:collapse;vertical-align: top;">
     <tr class="row-lg">
         <th style="width: 80px;padding:0;height:5px;"></th>
         <th style="width:30px; text-align: left;padding:0;height:5px; "><span class="text-item2">
@@ -275,7 +286,7 @@
     </tr>
 </table>
 
-<div style="height: 480px;margin-top:40px;">
+<div style="height: 460px;margin-top:53px;">
     <?php
     $total = 0;
     foreach ($invoice_all_data as $invoice_data) { ?>
@@ -283,7 +294,7 @@
             <tbody>
                 <tr>
 
-                    <td style="width: 185px;height:10px;">
+                    <td style="width: 200px;height:10px;">
                         <span class="fixed-width1">
                             <?php echo $invoice_data['product_name']; ?>
                         </span>
@@ -317,7 +328,7 @@
 <footer>
 
     <span>
-        <table style="display: inline-table; margin-left: 10px;height:0.3px;border-collapse:collapse;margin-top:0px">
+        <table style="display: inline-table; margin-left: 10px;height: 0.5px;border-collapse:separate;border-spacing:0 7px;margin-top:0px">
             <tr>
 
 

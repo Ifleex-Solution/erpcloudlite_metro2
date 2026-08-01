@@ -1,5 +1,16 @@
 <div class="metro-print-wrapper">
 <style>
+    @page {
+        size: 10in 8in;
+        margin: 0;
+    }
+
+    .metro-print-wrapper {
+        width: 10in;
+        min-height: 8in;
+        box-sizing: border-box;
+    }
+
     @media print {
         button {
             display: none;
@@ -26,11 +37,11 @@
     .fixed-width2 {
         display: inline-block;
         width: 38px;
-        height: 15px;
+        height: 18px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 15px;
         text-align: center;
         font-weight: bold;
         font-family: 'Calibri';
@@ -39,12 +50,12 @@
 
     .fixed-width1 {
         display: inline-block;
-        width: 220px;
-        height: 15px;
+        width: 400px;
+        height: 18px;
         overflow: hidden;
         /* text-overflow: ellipsis; */
         /* white-space: nowrap; */
-        font-size: 12px;
+        font-size: 15px;
         padding-left: 30px;
         text-align: left;
         font-weight: bold;
@@ -55,12 +66,12 @@
 
     .fixed-width3 {
         display: inline-block;
-        width: 70px;
-        height: 15px;
+        width: 115px;
+        height: 18px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 15px;
         padding-right: 15px;
         text-align: right;
         font-weight: bold;
@@ -72,12 +83,12 @@
 
     .fixed-width4 {
         display: inline-block;
-        width: 80px;
-        height: 15px;
+        width: 215px;
+        height: 18px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 15px;
         padding-left: 10px;
         text-align: right;
         font-weight: bold;
@@ -104,7 +115,7 @@
     .text-item2 {
         display: block;
         /* Left margin for all items */
-        font-size: 12px;
+        font-size: 15px;
         /* Font size for all items */
         /* Letter spacing for all items */
         margin-bottom: 3.5px;
@@ -137,7 +148,7 @@
     .text-item4 {
         display: block;
         /* Left margin for all items */
-        font-size: 13px;
+        font-size: 16px;
         /* Font size for all items */
         /* Letter spacing for all items */
         margin-bottom: 3.5px;
@@ -148,7 +159,7 @@
      .text-item6 {
         display: block;
         /* Left margin for all items */
-        font-size: 18px;
+        font-size: 21px;
         /* Font size for all items */
         /* Letter spacing for all items */
         margin-bottom: 3.5px;
@@ -181,35 +192,46 @@
 
 
 <!-- <span style="margin-top: 100x;"> -->
-<table style="display: inline-table;margin-top:26px; margin-left: 10px;border-collapse:collapse;vertical-align: top;">
+<table style="display: inline-table;margin-top: 40px; margin-left: 10px;border-collapse:collapse;vertical-align: top;">
     <tr class="row-lg">
-        <th style="width: 80px;padding:0;height:5px;"></th>
-        <th style="width:30px; text-align: left;padding:0;height:5px; "><span class="text-item2">
+        <th style="width: 50px;padding:0;height:5px;"></th>
+        <th style="width:200px; text-align: left;padding:0;height:5px; "><span class="text-item2">
                 <?php echo date("m/d/Y", strtotime($date)); ?>
             </span></th>
-        <th style="width: 200px;padding:0;height:5px;"></th>
-        <th style="width:200px; text-align: left;padding:0;height:5px;"><span class="text-item2">
+        <th style="width: 10px;padding:0;height:5px;"></th>
+        <th style="width:20px; text-align: left;padding:0;height:5px;"><span class="text-item2">
                 <?php echo $tax_invoice_id; ?>
 
             </span></th>
     </tr>
     <tr class="row-lg">
-        <th style="width: 80px;padding:0;height:5px;"></th>
-        <th style="width:30px; text-align: left;padding:0;height:5px; "></th>
-        <th style="width: 200px;padding:0;height:5px;"></th>
+        <th style="width: 50px;padding:0;height:5px;"></th>
+        <th style="width:200px; text-align: left;padding:0;height:5px; "></th>
+        <th style="width: 10px;padding:0;height:5px;"></th>
         <th style="width:200px; text-align: left;padding:0;height:5px;">
 
         </th>
     </tr>
     <tr class="row-sm">
-        <th style="width: 80px;padding:0;height:2px;"></th>
-        <th style="width:30px; text-align: left;padding:0;height:10px; ">
-           
+        <th style="width: 50px;padding:0;height:2px;">
+            
         </th>
-        <th style="width: 200px;padding:0;height:10px;text-align: left;"></th>
+        <th style="width:190px; text-align: left;padding:0;height:10px; ">
+             <span class="text-item2">
+            <?php
+        if($this->session->userdata('user_level2')!=3){
+                       echo "409378773-7000";
+                   }else{
+                       echo ".";
+                   }
+        
+        ?>
+           
+</span>
+        </th>
+        <th style="width: 60px;padding:0;height:10px;text-align: left;"></th>
         <th style="width:200px; text-align: left;padding:0;height:10px;">
-
-            <?php if (!empty($tinno)) { ?>
+ <?php if (!empty($tinno)) { ?>
                     <span class="text-item2">
                     <?php
                     
@@ -225,24 +247,17 @@
         </th>
     </tr>
     <tr class="row-xs">
-        <th style="width: 80px;"></th>
-        <th style="width:30px; text-align: left; "><span class="text-item2">
+        <th style="width: 50px;"></th>
+        <th style="width:200px; text-align: left; "><span class="text-item2">
         </th>
-        <th style="width: 200px;text-align: left;"> <span class="text-item2"><?php
-        if($this->session->userdata('user_level2')!=3){
-                       echo "409378773-7000";
-                   }else{
-                       echo ".";
-                   }
-        
-        ?></span></th>
+        <th style="width: 10px;text-align: left;"> <span class="text-item2"></span></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
                     <?php echo $customer_name ?>
                 </span></b></th>
     </tr>
     <tr class="row-lg1">
         <th style="width: 80px;">.</th>
-        <th style="width:30px; text-align: left; ">
+        <th style="width:190px; text-align: left; ">
         </th>
         <th style="width: 200px;"></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
@@ -251,10 +266,10 @@
                 </span></b></th>
     </tr>
     <tr class="row-xs">
-        <th style="width: 80px;"></th>
-        <th style="width:30px; text-align: left; ">
+        <th style="width: 50px;"></th>
+        <th style="width:200px; text-align: left; ">
         </th>
-        <th style="width: 200px;"></th>
+        <th style="width: 10px;"></th>
         <th style="width:200px; text-align: left;">
             <b>
                 <?php if (!empty($customer_mobile)) { ?>
@@ -275,11 +290,11 @@
     </tr>
 </table>
 
-<div style="height: 480px;margin-top:40px;">
+<div style="height: 360px;margin-top:90px;">
     <?php
     $total = 0;
     foreach ($invoice_all_data as $invoice_data) { ?>
-        <table>
+        <table style="margin-bottom: 10px;">
             <tbody>
                 <tr>
 
@@ -317,38 +332,28 @@
 <footer>
 
     <span>
-        <table style="display: inline-table; margin-left: 10px;height:0.3px;border-collapse:collapse;margin-top:0px">
+        <table style="display: inline-table; margin-left: 10px;height:0.3px;border-spacing:0 20px;margin-top:20px">
             <tr>
 
 
-                <th style="width: 85px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px; "><span class="text-item2">
-                        <?php echo $payment ?>
-                    </span></th>
-                <th style="width: 100px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px;"><span class="text-item4">
+                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item4">
                         <?php echo number_format($total23, 2, '.', ','); ?>
                     </span></th>
             </tr>
                <tr>
 
 
-                <th style="width: 85px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px; "><span class="text-item2">
-            </span></th>
-                <th style="width: 100px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px;"><span class="text-item4">
+                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item4">
                          <?php echo number_format($total_vat_amnt, 2, '.', ','); ?>
                     </span></th>
             </tr>
                <tr>
 
 
-                <th style="width: 85px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px; "><span class="text-item2">
-                    </span></th>
-                <th style="width: 100px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px;"><span class="text-item6">
+                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item6">
                     <span class="text-item6">
                         <?php echo number_format($grandTotal, 2, '.', ','); ?>
                     </span>

@@ -2703,10 +2703,8 @@ echo "</script>";
         if (document.getElementById('invoicetype').value == 'cash_vat' ||
             document.getElementById('invoicetype').value == 'credit_vat' ||
             document.getElementById('invoicetype').value == 'svat') {
-            vat_percent = $("#vat_percent" + sl).val();
-
-
-
+            vat_percent = 18;
+            $("#vat_percent" + sl).val(vat_percent);
         }
         let value = $("#code" + sl).val();
         let number = parseInt(value.replace(/,/g, ''), 10);
@@ -2798,6 +2796,20 @@ echo "</script>";
         var gttl = gr_tot - dis;
         var grandtotal = parseFloat(gttl) + parseFloat(vatamnt);
         $("#grandTotal").val(grandtotal.toFixed(2, 2));
+
+        if (document.getElementById('invoicetype').value == 'cash_vat' ||
+            document.getElementById('invoicetype').value == 'credit_vat' ||
+            document.getElementById('invoicetype').value == 'svat') {
+            let btotal = gttl / 1.18;
+            let vtotal = btotal * (18 / 100);
+            $("#total_vat_amnt").val(vtotal.toFixed(2, 2));
+            $("#Total").val(btotal.toFixed(2, 2));
+            let gtotal = vtotal + btotal;
+            $("#grandTotal").val(gtotal.toFixed(2, 2));
+        } else {
+            $("#total_vat_amnt").val(0);
+            $("#Total").val(gttl.toFixed(2, 2));
+        }
         // $("#pamount_by_method").val(grandtotal.toFixed(2, 2));
 
         // $('#paidAmount').val(grandtotal.toFixed(2, 2));
