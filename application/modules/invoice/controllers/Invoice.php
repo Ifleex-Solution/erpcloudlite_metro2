@@ -3209,7 +3209,8 @@ class Invoice extends MX_Controller
         WHERE pod.product = c.product
           AND pod.store = c.store 
           AND pod.batch = c.batch 
-    ) AS avstock,pi.batchtype,po.invoicetype,AES_DECRYPT(sod.sale_id, '{$encryption_key}') as sale_id 
+    ) AS avstock,pi.batchtype,po.invoicetype,AES_DECRYPT(sod.sale_id, '{$encryption_key}') as sale_id
+     ,AES_DECRYPT(sod.tax_invoice_id, '{$encryption_key}') as tax_invoice_id
      ,AES_DECRYPT(pod.rdeduction, '{$encryption_key}') as rdeduction  ");
         $this->db->from('sales_return po');
         $this->db->join('customer_information si', 'si.customer_id = po.customer_id', 'inner');
@@ -4845,7 +4846,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
     {
         $encryption_key = Config::$encryption_key;
 
-        $salesorder_result = $this->db->select("id,AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_id")
+        $salesorder_result = $this->db->select("id,AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_id,AES_DECRYPT(s.tax_invoice_id, '{$encryption_key}') AS tax_invoice_id")
             ->from('sale s')
             ->where("AES_DECRYPT(s.type2,'" . $encryption_key . "')", $this->input->post('type2', TRUE))
             ->where("s.branch", $this->input->post('branch', TRUE))
@@ -5620,7 +5621,7 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
             AES_DECRYPT(sr.total_vat_amnt, '{$encryption_key}') AS total_vat_amnt,
             AES_DECRYPT(sr.grandTotal, '{$encryption_key}') AS grandTotal,
             AES_DECRYPT(sr.total, '{$encryption_key}') AS total,
-            AES_DECRYPT(s.sale_id, '{$encryption_key}') AS sale_invoice_no
+            AES_DECRYPT(s.tax_invoice_id, '{$encryption_key}') AS sale_invoice_no
         ")
         ->from('sales_return sr')
         ->join('sale s', 's.id = sr.sales_id', 'left')

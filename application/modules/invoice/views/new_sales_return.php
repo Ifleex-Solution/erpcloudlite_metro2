@@ -860,7 +860,7 @@ echo "</script>";
 
                     document.getElementById("showorderno").style.display = "none";
                     document.getElementById("showorderno2").style.display = "block";
-                    document.getElementById('invoice_id1').value = sales[0].sale_id;
+                    document.getElementById('invoice_id1').value = sales[0].tax_invoice_id;
 
 
 
@@ -1737,7 +1737,7 @@ echo "</script>";
                 $branchDropdown.append('<option value="" disabled selected>Select Sales Order</option>'); // Add default option
 
                 $.each(salesorder, function(index, branch) {
-                    $branchDropdown.append('<option value="' + branch.id + '">' + branch.sale_id + '</option>');
+                    $branchDropdown.append('<option value="' + branch.id + '">' + branch.tax_invoice_id + '</option>');
 
                 });
 
