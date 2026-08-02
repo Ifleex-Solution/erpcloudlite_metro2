@@ -240,7 +240,7 @@
                             <label class="col-sm-4 col-form-label">Default Store <i class="text-danger">*</i></label>
                             <div class="col-sm-8">
                                 <select class="form-control" id="store" name="store" tabindex="3">
-                                    <option value="1" <?php if ($product->store == 1 || empty($product->id)) echo 'selected'; ?>>N/A</option>
+                                    <option value="" <?php if (empty($product->id)) echo 'selected'; ?>></option>
                                     <?php if ($store_list) { foreach ($store_list as $categories) { ?>
                                         <option value="<?php echo $categories['id'] ?>"
                                             <?php if ($product->store == $categories['id']) echo 'selected'; ?>>
@@ -256,9 +256,9 @@
                             <div class="col-sm-8">
                                 <select class="form-control" id="defaultsaleprice" required name="defaultsaleprice" tabindex="3">
                                     <option value=""></option>
-                                    <option value="fixedprice" <?php if ($product->defaultsaleprice == "fixedprice") echo 'selected'; ?>>Fixed Price</option>
+                                    <option value="fixedprice" <?php if ($product->defaultsaleprice == "fixedprice" || (empty($product->id) && empty($product->defaultsaleprice))) echo 'selected'; ?>>Fixed Price</option>
                                     <option value="mrp" <?php if ($product->defaultsaleprice == "mrp") echo 'selected'; ?>>MRP</option>
-                                    <option value="custom" <?php if ($product->defaultsaleprice == "custom" || (empty($product->id) && empty($product->defaultsaleprice))) echo 'selected'; ?>>Custom</option>
+                                    <option value="custom" <?php if ($product->defaultsaleprice == "custom") echo 'selected'; ?>>Custom</option>
                                 </select>
                             </div>
                         </div>

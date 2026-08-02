@@ -2515,7 +2515,7 @@ function saveNewProduct() {
             defaultsaleprice: $('#ap_defaultsaleprice').val(),
             unit:             unit,
             stock:            $('#ap_stock').val(),
-            store:            $('#ap_store').val() || 1,
+            store:            $('#ap_store').val(),
             supplier_id:      $('#ap_supplier_id').val() || 0,
             status:           '1',
             subcategory_id:   0,

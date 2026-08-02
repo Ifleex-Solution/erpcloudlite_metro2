@@ -2736,7 +2736,7 @@ function saveNewProduct() {
             category_id: $('#ap_category_id').val(), subcategory_id: 0, brand_id: 0,
             product_type: $('#ap_product_type').val(), batchtype: $('#ap_batchtype').val(),
             defaultsaleprice: $('#ap_defaultsaleprice').val(), unit: $('#ap_unit').val(),
-            store: $('#ap_store').val() || 1, supplier_id: $('#ap_supplier_id').val() || 0,
+            store: $('#ap_store').val(), supplier_id: $('#ap_supplier_id').val() || 0,
             stock: $('#ap_stock').val(), status: '1',
             ad: '', bd: '', printname: '', oop_id: '', vat: '0', sell_price: '0', cost_price: '0'
         },

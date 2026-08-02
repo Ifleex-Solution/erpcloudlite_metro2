@@ -724,7 +724,8 @@
 
                                 <td class="rate vathidden">
                                     <input type="hidden" name="vatpercent[]" onkeyup="calculate_sum(1);" onchange="calculate_sum(1);" id="vat_percent1" class="form-control vat_percent_1 text-right" min="0" tabindex="13" placeholder="0.00" />
-                                    <input type="text" name="vatvalue[]" id="vat_value1" class="form-control vat_value1 text-right total_vatamnt" min="0" tabindex="14" placeholder="0.00" readonly />
+                                    <span class="text-muted" style="font-size:11px;">18%</span>
+                                    <input type="text" name="vatvalue[]" id="vat_value1" class="form-control vat_value1 text-right total_vatamnt" min="0" tabindex="14" placeholder="0.00" readonly style="display:none;" />
                                 </td>
 
                                 <!-- VAT  end-->
@@ -819,7 +820,8 @@
 
                                     <td class="rate vathidden">
                                         <input type="hidden" name="vatpercent[]" onkeyup="calculate_sum(<?php echo $i; ?>);" onchange="calculate_sum(<?php echo $i; ?>);" id="vat_percent<?php echo $i; ?>" class="form-control vat_percent_1 text-right" min="0" tabindex="13" placeholder="0.00" />
-                                        <input type="text" name="vatvalue[]" id="vat_value<?php echo $i; ?>" class="form-control vat_value1 text-right total_vatamnt" min="0" tabindex="14" placeholder="0.00" readonly />
+                                        <span class="text-muted" style="font-size:11px;">18%</span>
+                                        <input type="text" name="vatvalue[]" id="vat_value<?php echo $i; ?>" class="form-control vat_value1 text-right total_vatamnt" min="0" tabindex="14" placeholder="0.00" readonly style="display:none;" />
                                     </td>
 
                                     <!-- VAT end -->
@@ -3292,7 +3294,7 @@ function saveNewProduct() {
             category_id: $('#ap_category_id').val(), subcategory_id: 0, brand_id: 0,
             product_type: $('#ap_product_type').val(), batchtype: $('#ap_batchtype').val(),
             defaultsaleprice: $('#ap_defaultsaleprice').val(), unit: $('#ap_unit').val(),
-            store: $('#ap_store').val() || 1, supplier_id: $('#ap_supplier_id').val() || 0,
+            store: $('#ap_store').val(), supplier_id: $('#ap_supplier_id').val() || 0,
             stock: $('#ap_stock').val(), status: '1',
             ad: '', bd: '', printname: '', oop_id: '', vat: '0', sell_price: '0', cost_price: '0'
         },
