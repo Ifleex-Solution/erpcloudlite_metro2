@@ -2532,7 +2532,7 @@ class Invoice extends MX_Controller
             'details'    => $this->input->post('details', TRUE),
             'invoiceno' => $num,
             'tax_invoice_id' => $tax_invoice_id,
-            'payment' => $this->input->post('payment', TRUE)
+            'payment' => $this->payment_type_name($this->input->post('payment_type', TRUE))
         );
 
         $data['users_name']  = $this->session->userdata('fullname');
@@ -3636,7 +3636,7 @@ WHERE id = '{$item['invoicedetail']}'
             'details'    => $this->input->post('details', TRUE),
             'invoiceno' => $invoiceno[0]['sale_id'],
             'tax_invoice_id' => $invoiceno[0]['tax_invoice_id'],
-            'payment' => $this->input->post('payment', TRUE)
+            'payment' => $this->payment_type_name($this->input->post('payment_type', TRUE))
         );
 
         $data['users_name']  = $this->session->userdata('fullname');
@@ -4336,7 +4336,7 @@ WHERE id = '{$item['invoicedetail']}'
             'details'    => "",
             'invoiceno' => $sale[0]['sale_id'],
             'tax_invoice_id' => $sale[0]['tax_invoice_id'],
-            'payment' => ""
+            'payment' => $this->payment_type_name($sale[0]['payment_type'])
         );
 
         $data['users_name']  = $this->session->userdata('fullname');
@@ -4409,7 +4409,7 @@ WHERE id = '{$item['invoicedetail']}'
          AES_DECRYPT(discount, '" . $encryption_key . "') AS discount,
           AES_DECRYPT(total_discount_ammount, '" . $encryption_key . "') AS total_discount_ammount,
          AES_DECRYPT(total_vat_amnt, '" . $encryption_key . "') AS total_vat_amnt,customer_id,
-            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date,details,branch ")
+            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date,details,branch,payment_type ")
             ->from('sale')
             ->where('id', $id)
             ->get()
@@ -5606,6 +5606,17 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
 
 
      }
+
+    private function payment_type_name($id)
+    {
+        if (empty($id)) {
+            return "";
+        }
+
+        $row = $this->db->select('name')->from('payment_type')->where('id', $id)->get()->row();
+
+        return $row ? $row->name : "";
+    }
 
     private function _build_sales_return_print($id)
     {
