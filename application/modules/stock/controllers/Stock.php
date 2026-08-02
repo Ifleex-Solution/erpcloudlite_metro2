@@ -2049,7 +2049,7 @@ WHERE id = '{$id}';
         $base_url = base_url();
         echo '<script type="text/javascript">
         alert("Deleted successfully");
-        window.location.href = "' . $base_url . 'manage_stock_adjustment";
+        window.location.href = "' . $base_url . 'manage_inventory_transection";
        </script>';
 
         // redirect("manage_stock_adjustment");

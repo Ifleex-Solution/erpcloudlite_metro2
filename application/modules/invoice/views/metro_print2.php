@@ -261,8 +261,7 @@
         </th>
         <th style="width: 200px;"></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
-
-
+                    <?php echo $customer_address; ?>
                 </span></b></th>
     </tr>
     <tr class="row-xs">
@@ -335,30 +334,43 @@
         <table style="display: inline-table; margin-left: 10px;height:0.3px;border-spacing:0 20px;margin-top:20px">
             <tr>
 
-
-                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width: 480px;padding:0;height:20px;text-align: left;"></th>
+                <th style="width: 140px;padding:0;height:20px;"></th>
                 <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item4">
                         <?php echo number_format($total23, 2, '.', ','); ?>
                     </span></th>
             </tr>
                <tr>
 
-
-                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width: 480px;padding:0;height:20px;"></th>
+                <th style="width: 140px;padding:0;height:20px;"></th>
                 <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item4">
                          <?php echo number_format($total_vat_amnt, 2, '.', ','); ?>
                     </span></th>
             </tr>
                <tr>
 
-
-                <th style="width: 620px;padding:0;height:20px;"></th>
+                <th style="width: 480px;padding:0;height:20px;"></th>
+                <th style="width: 140px;padding:0;height:20px;"></th>
                 <th style="width:140px; text-align: left;padding:0;height:20px;"><span class="text-item6">
                     <span class="text-item6">
                         <?php echo number_format($grandTotal, 2, '.', ','); ?>
                     </span>
                    </th>
             </tr>
+             <tr>
+
+                <th style="width: 480px;padding:0;height:20px;"></th>
+                <th style="width: 140px;padding:0;height:20px;"></th>
+                <th style="width:140px; text-align: left;padding:0;padding-top:10px;height:20px;"><span class="text-item6">
+                    <span class="text-item4">
+                            <?php echo $payment ?>
+
+                    </span>
+                   </th>
+            </tr>
+             
+
 
         </table>
     </span>
