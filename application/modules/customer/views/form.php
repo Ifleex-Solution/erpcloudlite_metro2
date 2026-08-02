@@ -255,10 +255,10 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group row">
-                            <label for="email_address" class="col-sm-4 col-form-label">VAT No</label>
+                            <label for="email_address" class="col-sm-4 col-form-label">Customer TIN</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control" name="email_address" id="email_address"
-                                    placeholder="VAT No" value="<?php echo $customer->email_address ?>">
+                                    placeholder="Customer TIN" value="<?php echo $customer->email_address ?>">
                             </div>
                         </div>
                     </div>

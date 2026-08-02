@@ -2937,8 +2937,9 @@ class Invoice extends MX_Controller
         // Live saves get the plain number; testing-environment saves get it Test_-prefixed,
         // counted in its own separate space so test saves never touch the live sequence
         if ($branch === 3) {
-            $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : 500000001;
-            return ($type2 === 'B') ? ('Test_' . $next_seq) : (string) $next_seq;
+            $default_seq = 5000002427;
+            $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : $default_seq;
+            return  ('Test_' . $next_seq);
         }
 
         // type2 = 'B' is the testing environment — its own numbering scheme, kept
@@ -2953,10 +2954,11 @@ class Invoice extends MX_Controller
             return 'Test_' . $branch . str_pad($next_seq, 8, '0', STR_PAD_LEFT);
         }
 
-        $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : 1;
+        $branch_start_seq = [1 => 1266, 2 => 32];
+        $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : ($branch_start_seq[$branch] ?? 1);
 
         $branch_code = sprintf('BR%02d', $branch);
-        $date_part   = strtoupper(date('YM', strtotime($sale_date)));
+        $date_part   = strtoupper(date('yM', strtotime($sale_date)));
 
         return $date_part . '_' . $branch_code . '_' . $next_seq;
     }
