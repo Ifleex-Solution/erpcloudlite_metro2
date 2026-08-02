@@ -2518,7 +2518,7 @@ function saveNewProduct() {
             batchtype:        $('#ap_batchtype').val(),
             defaultsaleprice: $('#ap_defaultsaleprice').val(),
             unit:             $('#ap_unit').val(),
-            store:            $('#ap_store').val() || 1,
+            store:            $('#ap_store').val(),
             supplier_id:      $('#ap_supplier_id').val() || 0,
             stock:            $('#ap_stock').val(),
             status:           '1',
