@@ -2155,7 +2155,7 @@ $this->permission1->method('add_product_group', 'create')->access()
                     <?php if (
                         $this->permission1->method('gross_profit_report', 'read')->access() ||
                         $this->permission1->method('gross_profit_category_report', 'read')->access() ||
-                        $this->permission1->method('profit_report_invoicewise', 'read')->access()
+                        $this->permission1->method('profit_repo rt_invoicewise', 'read')->access()
                     ) { ?>
                         <!-- Supplier menu start -->
                         <li class="treeview <?php

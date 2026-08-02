@@ -1857,9 +1857,9 @@ class Invoice_model extends CI_Model
         ## Search 
         $searchQuery = "";
         if ($searchValue != '') {
-            $searchQuery = " (po.id like '%" . $searchValue . "%' or po.date like '%" . $searchValue . "%'  
+            $searchQuery = " (AES_DECRYPT(po.tax_invoice_id,'" . $encryption_key . "') like '%" . $searchValue . "%' or po.date like '%" . $searchValue . "%'
              OR (
-        CASE 
+        CASE
             WHEN po.incidenttype = 1 THEN 'Retail'
             WHEN po.incidenttype = 2 THEN 'Whole Sales'
             ELSE ''
