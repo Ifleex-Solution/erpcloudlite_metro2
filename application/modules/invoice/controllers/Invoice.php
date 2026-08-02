@@ -2937,9 +2937,9 @@ class Invoice extends MX_Controller
         // Live saves get the plain number; testing-environment saves get it Test_-prefixed,
         // counted in its own separate space so test saves never touch the live sequence
         if ($branch === 3) {
-            $default_seq = ($type2 === 'B') ? 5000002427 : 500000001;
+            $default_seq = 5000002427;
             $next_seq = ($raw_max !== null && $raw_max !== '') ? ((int) $raw_max + 1) : $default_seq;
-            return ($type2 === 'B') ? ('Test_' . $next_seq) : (string) $next_seq;
+            return  ('Test_' . $next_seq);
         }
 
         // type2 = 'B' is the testing environment — its own numbering scheme, kept
