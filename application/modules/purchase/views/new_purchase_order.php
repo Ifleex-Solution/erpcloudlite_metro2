@@ -2398,9 +2398,9 @@ echo "</script>";
                             <div class="form-group">
                                 <label style="font-weight:700;">Default Sales Price</label>
                                 <select id="ap_defaultsaleprice" class="form-control">
-                                    <option value="fixedprice">Fixed Price</option>
+                                    <option value="fixedprice" selected>Fixed Price</option>
                                     <option value="mrp">MRP</option>
-                                    <option value="custom" selected>Custom</option>
+                                    <option value="custom">Custom</option>
                                 </select>
                             </div>
                         </div>
@@ -2418,8 +2418,8 @@ echo "</script>";
                             <div class="form-group">
                                 <label style="font-weight:700;">Stock</label>
                                 <select id="ap_stock" class="form-control">
-                                    <option value="1">Enable</option>
-                                    <option value="0" selected>Disable</option>
+                                    <option value="1" selected>Enable</option>
+                                    <option value="0">Disable</option>
                                 </select>
                             </div>
                         </div>
@@ -2429,7 +2429,7 @@ echo "</script>";
                             <div class="form-group">
                                 <label style="font-weight:700;">Default Store</label>
                                 <select id="ap_store" class="form-control">
-                                    <option value="1" selected>N/A</option>
+                                    <option value="" selected></option>
                                 </select>
                             </div>
                         </div>
@@ -2457,10 +2457,10 @@ function openAddProductModal() {
     $('#ap_product_name').val('');
     $('#ap_product_type').val('N/A');
     $('#ap_batchtype').val('3');
-    $('#ap_defaultsaleprice').val('custom');
-    $('#ap_stock').val('0');
+    $('#ap_defaultsaleprice').val('fixedprice');
+    $('#ap_stock').val('1');
 
-    var $store = $('#ap_store').empty().append('<option value="1" selected>N/A</option>');
+    var $store = $('#ap_store').empty().append('<option value="" selected></option>');
     if (stores) $.each(stores, function(i, s) { $store.append('<option value="'+s.id+'">'+s.name+'</option>'); });
 
     var $sup = $('#ap_supplier_id').empty().append('<option value="">Select Supplier</option>');
