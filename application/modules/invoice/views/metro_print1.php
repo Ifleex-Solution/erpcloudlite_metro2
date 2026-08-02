@@ -66,7 +66,7 @@
 
     .fixed-width3 {
         display: inline-block;
-        width: 70px;
+        width: 81px;
         height: 15px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -195,7 +195,7 @@
 <table style="display: inline-table;margin-top:32px; margin-left: 10px;border-collapse:collapse;vertical-align: top;">
     <tr class="row-lg">
         <th style="width: 80px;padding:0;height:5px;"></th>
-        <th style="width:30px; text-align: left;padding:0;height:5px; "><span class="text-item2">
+        <th style="width:30px; text-align: left;padding-left:5px;height:5px; "><span class="text-item2">
                 <?php echo date("m/d/Y", strtotime($date)); ?>
             </span></th>
         <th style="width: 200px;padding:0;height:5px;"></th>
@@ -257,8 +257,7 @@
         </th>
         <th style="width: 200px;"></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
-
-
+                    <?php echo $customer_address; ?>
                 </span></b></th>
     </tr>
     <tr class="row-xs">
@@ -333,7 +332,7 @@
 
 
                 <th style="width: 85px;padding:0;height:5px;"></th>
-                <th style="width:140px; text-align: left;padding:0;height:5px; "><span class="text-item2">
+                <th style="width:140px; text-align: left;padding-left:5px;height:5px; "><span class="text-item2">
                         <?php echo $payment ?>
                     </span></th>
                 <th style="width: 100px;padding:0;height:5px;"></th>
