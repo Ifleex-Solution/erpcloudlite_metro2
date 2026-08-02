@@ -711,6 +711,7 @@ echo "</script>";
             );
         }
     });
+        let type2 = ""
 
     $(document).ready(function() {
         // document.getElementById('showBtn1').style.display = 'none';
@@ -719,7 +720,6 @@ echo "</script>";
         $('#type').select2({placeholder: 'Select option', allowClear: true});
         $('#type').on('select2:select select2:unselect', function() { change_type(); });
 
-        let type2 = ""
 
         if (usertype == 3) {
             document.getElementById('style12').style.backgroundColor = '#E0E0E0';
