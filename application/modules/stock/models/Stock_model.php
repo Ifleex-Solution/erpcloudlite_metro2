@@ -894,9 +894,9 @@ public function check_batch_has_transactions($batch_id)
                 OR AES_DECRYPT(ci1.customer_name,'{$encryption_key}') LIKE '%{$searchValue}%'
             
                 OR (
-                    (ds.type IN ('sale', 'wholesale')  
-                        AND AES_DECRYPT(p.sale_id,'{$encryption_key}') LIKE '%{$searchValue}%')
-                    OR (ds.type != 'sale' 
+                    (ds.type IN ('sale', 'wholesale')
+                        AND AES_DECRYPT(p.tax_invoice_id,'{$encryption_key}') LIKE '%{$searchValue}%')
+                    OR (ds.type != 'sale'
                         AND AES_DECRYPT(pr.purchase_return_id,'{$encryption_key}') LIKE '%{$searchValue}%')
                 )
                 OR (
@@ -983,8 +983,8 @@ public function check_batch_has_transactions($batch_id)
             AES_DECRYPT(ds.gdn_id,'{$encryption_key}') AS gdn_id,
             ds.detail,
             ds.date,
-          CASE 
-    WHEN ds.type IN ('sale', 'wholesale') THEN AES_DECRYPT(p.sale_id,'{$encryption_key}')
+          CASE
+    WHEN ds.type IN ('sale', 'wholesale') THEN AES_DECRYPT(p.tax_invoice_id,'{$encryption_key}')
     ELSE AES_DECRYPT(pr.purchase_return_id,'{$encryption_key}')
 END AS voucherno,
            CASE 

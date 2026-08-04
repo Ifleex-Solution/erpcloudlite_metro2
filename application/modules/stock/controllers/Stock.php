@@ -3273,7 +3273,7 @@ WHERE id = '{$id}';
         if ($this->input->post('type', TRUE) == "sale"||$this->input->post('type', TRUE) == "wholesale") {
 
 
-            $this->db->select('p.id, AES_DECRYPT( p.sale_id  , "' . $encryption_key . '") as voucherno,AES_DECRYPT(si.customer_name  , "' . $encryption_key . '") as customer_name ');
+            $this->db->select('p.id, AES_DECRYPT( p.tax_invoice_id  , "' . $encryption_key . '") as voucherno,AES_DECRYPT(si.customer_name  , "' . $encryption_key . '") as customer_name ');
             $this->db->from('sale_details pd');
             $this->db->join('sale p', 'p.id = pd.pid', 'inner');
             $this->db->join('store s', 's.id = pd.store', 'inner');
@@ -4234,7 +4234,7 @@ WHERE id = '{$id}';
     a.date,
     a.vehicleno,
     CASE
-        WHEN a.type IN ('sale', 'wholesale') THEN AES_DECRYPT(sa.sale_id, '{$encryption_key}')
+        WHEN a.type IN ('sale', 'wholesale') THEN AES_DECRYPT(sa.tax_invoice_id, '{$encryption_key}')
         WHEN a.type = 'purchasereturn' THEN AES_DECRYPT(sr.purchase_return_id, '{$encryption_key}')
         ELSE NULL
     END AS voucher_no,
@@ -4320,7 +4320,7 @@ WHERE id = '{$id}';
     a.date,
     a.vehicleno,
     CASE
-        WHEN a.type IN ('sale', 'wholesale') THEN AES_DECRYPT(sa.sale_id, '{$encryption_key}')
+        WHEN a.type IN ('sale', 'wholesale') THEN AES_DECRYPT(sa.tax_invoice_id, '{$encryption_key}')
         WHEN a.type = 'purchasereturn' THEN AES_DECRYPT(sr.purchase_return_id, '{$encryption_key}')
         ELSE NULL
     END AS voucher_no,
