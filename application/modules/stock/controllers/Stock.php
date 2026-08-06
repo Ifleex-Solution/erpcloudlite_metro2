@@ -4482,133 +4482,260 @@ WHERE id = '{$id}';
         return false;
     }
 
-    public function getBatchInStockByProductAndBatchtype()
+  public function getBatchInStockByProductAndBatchtype()
+
     {
+
         $encryption_key = Config::$encryption_key;
+
         $currentDate    = date('Y-m-d');
+
         $product_id     = $this->input->post('product', TRUE);
+
         $nstock         = $this->input->post('nstock', TRUE);
+
         // nstock=0 means product has stock-tracking disabled; skip the stock quantity filter
+
         $apply_stock_filter = ($nstock !== '0' && $nstock !== 0);
+
+
 
         $escaped_pid = $this->db->escape($product_id);
 
+
+
         $stock_filter_single = "
+
             (
+
                 (SELECT IFNULL(SUM(CAST(AES_DECRYPT(sd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+
                    FROM stock_details sd
+
                   WHERE sd.batch   = stockbatch.id
+
                     AND sd.product = CAST(stockbatch.product AS CHAR))
+
               + (SELECT IFNULL(SUM(CAST(AES_DECRYPT(pd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+
                    FROM phystock_details pd
+
                   WHERE pd.batch   = stockbatch.id
+
                     AND pd.product = CAST(stockbatch.product AS CHAR))
+
             ) > 0";
+
+
 
         $stock_filter_multi = "
+
             (
+
                 (SELECT IFNULL(SUM(CAST(AES_DECRYPT(sd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+
                    FROM stock_details sd
+
                   WHERE sd.batch   = stockbatch.id
+
                     AND sd.product = {$escaped_pid})
+
               + (SELECT IFNULL(SUM(CAST(AES_DECRYPT(pd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+
                    FROM phystock_details pd
+
                   WHERE pd.batch   = stockbatch.id
+
                     AND pd.product = {$escaped_pid})
+
             ) > 0";
 
+
+
         if ($this->input->post('batchtype', TRUE) == 1) {
+
             $this->db->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid');
+
             $this->db->from('stockbatch');
+
             $this->db->where('busage', 'single');
+
             $this->db->where('product', $product_id);
-            if (!$this->input->post('id', TRUE)) {
-                $this->db->where('status', 1);
-            }
-            if ($apply_stock_filter) {
-                $this->db->where($stock_filter_single, NULL, FALSE);
-            }
-            $query = $this->db->get();
-            if ($query->num_rows() > 0) {
-                echo json_encode($query->result_array());
-            } else {
-                echo "not";
-            }
-        } else if ($this->input->post('batchtype', TRUE) == 2) {
-            $this->db->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid');
-            $this->db->from('stockbatch');
-            $this->db->where('busage', 'multiple');
-            if (!$this->input->post('id', TRUE)) {
-                $this->db->where('status', 1);
-            }
-            if ($apply_stock_filter) {
-                $this->db->where($stock_filter_multi, NULL, FALSE);
-            }
-            $query = $this->db->get();
-            if ($query->num_rows() > 0) {
-                echo json_encode($query->result_array());
-            } else {
-                echo "not";
-            }
-        } else if ($this->input->post('batchtype', TRUE) == 3) {
-            if (!$this->input->post('id', TRUE)) {
-                $q1 = $this->db
-                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
-                    ->from('stockbatch')
-                    ->where('busage', 'single')
-                    ->where('product', $product_id)
-                    ->where('mdate <=', $currentDate)
-                    ->group_start()
-                    ->where('edate_enabled', 0)
-                    ->or_where('edate >=', $currentDate)
-                    ->group_end()
-                    ->where('status', 1);
-                if ($apply_stock_filter) {
-                    $q1->where($stock_filter_single, NULL, FALSE);
-                }
-                $query1 = $q1->get_compiled_select();
-            } else {
-                $q1 = $this->db
-                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
-                    ->from('stockbatch')
-                    ->where('busage', 'single')
-                    ->where('product', $product_id);
-                if ($apply_stock_filter) {
-                    $q1->where($stock_filter_single, NULL, FALSE);
-                }
-                $query1 = $q1->get_compiled_select();
-            }
 
             if (!$this->input->post('id', TRUE)) {
-                $q2 = $this->db
-                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
-                    ->from('stockbatch')
-                    ->where('busage', 'multiple')
-                    ->where('status', 1);
-                if ($apply_stock_filter) {
-                    $q2->where($stock_filter_multi, NULL, FALSE);
-                }
-                $query2 = $q2->get_compiled_select();
-            } else {
-                $q2 = $this->db
-                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
-                    ->from('stockbatch')
-                    ->where('busage', 'multiple');
-                if ($apply_stock_filter) {
-                    $q2->where($stock_filter_multi, NULL, FALSE);
-                }
-                $query2 = $q2->get_compiled_select();
+
+                $this->db->where('status', 1);
+
             }
+
+            if ($apply_stock_filter) {
+
+                $this->db->where($stock_filter_single, NULL, FALSE);
+
+            }
+
+            $query = $this->db->get();
+
+            if ($query->num_rows() > 0) {
+
+                echo json_encode($query->result_array());
+
+            } else {
+
+                echo "not";
+
+            }
+
+        } else if ($this->input->post('batchtype', TRUE) == 2) {
+
+            $this->db->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid');
+
+            $this->db->from('stockbatch');
+
+            $this->db->where('busage', 'multiple');
+
+            if (!$this->input->post('id', TRUE)) {
+
+                $this->db->where('status', 1);
+
+            }
+
+            if ($apply_stock_filter) {
+
+                $this->db->where($stock_filter_multi, NULL, FALSE);
+
+            }
+
+            $query = $this->db->get();
+
+            if ($query->num_rows() > 0) {
+
+                echo json_encode($query->result_array());
+
+            } else {
+
+                echo "not";
+
+            }
+
+        } else if ($this->input->post('batchtype', TRUE) == 3) {
+
+            if (!$this->input->post('id', TRUE)) {
+
+                $q1 = $this->db
+
+                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
+
+                    ->from('stockbatch')
+
+                    ->where('busage', 'single')
+
+                    ->where('product', $product_id)
+
+                    ->where('mdate <=', $currentDate)
+
+                    ->group_start()
+
+                    ->where('edate_enabled', 0)
+
+                    ->or_where('edate >=', $currentDate)
+
+                    ->group_end()
+
+                    ->where('status', 1);
+
+                if ($apply_stock_filter) {
+
+                    $q1->where($stock_filter_single, NULL, FALSE);
+
+                }
+
+                $query1 = $q1->get_compiled_select();
+
+            } else {
+
+                $q1 = $this->db
+
+                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
+
+                    ->from('stockbatch')
+
+                    ->where('busage', 'single')
+
+                    ->where('product', $product_id);
+
+                if ($apply_stock_filter) {
+
+                    $q1->where($stock_filter_single, NULL, FALSE);
+
+                }
+
+                $query1 = $q1->get_compiled_select();
+
+            }
+
+
+
+            if (!$this->input->post('id', TRUE)) {
+
+                $q2 = $this->db
+
+                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
+
+                    ->from('stockbatch')
+
+                    ->where('busage', 'multiple')
+
+                    ->where('status', 1);
+
+                if ($apply_stock_filter) {
+
+                    $q2->where($stock_filter_multi, NULL, FALSE);
+
+                }
+
+                $query2 = $q2->get_compiled_select();
+
+            } else {
+
+                $q2 = $this->db
+
+                    ->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid', FALSE)
+
+                    ->from('stockbatch')
+
+                    ->where('busage', 'multiple');
+
+                if ($apply_stock_filter) {
+
+                    $q2->where($stock_filter_multi, NULL, FALSE);
+
+                }
+
+                $query2 = $q2->get_compiled_select();
+
+            }
+
+
 
             $finalQuery = $this->db->query("$query1 UNION $query2");
+
             if ($finalQuery->num_rows() > 0) {
+
                 echo json_encode($finalQuery->result_array());
+
             } else {
+
                 echo "not";
+
             }
+
         }
 
+
+
         return false;
+
     }
 
      public function getBatchbyProductAndBatchtype2()

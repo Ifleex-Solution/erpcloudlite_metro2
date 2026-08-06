@@ -68,9 +68,9 @@ class Invoice extends MX_Controller
         $data['all_pmethod'] = $this->pmethod_dropdown();
         $data['products'] = $this->active_product();
         if ($id) {
-            $data['store_list'] = $this->product_model->all_store();
+            $data['store_list'] = $this->product_model->active_store_for_user(false);
         } else {
-            $data['store_list'] = $this->product_model->active_store();
+            $data['store_list'] = $this->product_model->active_store_for_user(true);
         }
         $data["batches"] = $this->active_batch();
         $data['units'] = $this->active_units();
