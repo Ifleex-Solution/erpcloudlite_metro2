@@ -301,6 +301,37 @@ class Product_model extends CI_Model
         return false;
     }
 
+    // Same admin-vs-sec_store pattern used by Stock::active_storegdndrop() —
+    // admins (user_level2 == 1) see every store, everyone else only the
+    // stores assigned to them via sec_store.
+    public function active_store_for_user($only_active = true)
+    {
+        if ($this->session->userdata('user_level2') == 1) {
+            $this->db->select('store.*');
+            $this->db->from('store');
+            if ($only_active) {
+                $this->db->where('status', 1);
+            }
+            $this->db->where_not_in('id', 1);
+        } else {
+            $this->db->select('store.*');
+            $this->db->from('sec_store');
+            $this->db->join('store', 'store.id = sec_store.storeid');
+            $this->db->where('sec_store.userid', $this->session->userdata('id'));
+            if ($only_active) {
+                $this->db->where('store.status', 1);
+            }
+            $this->db->where_not_in('store.id', 1);
+            $this->db->group_by('sec_store.storeid');
+        }
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            return $query->result_array();
+        }
+        return false;
+    }
+
     public function active_unit()
     {
         $this->db->select('*');
