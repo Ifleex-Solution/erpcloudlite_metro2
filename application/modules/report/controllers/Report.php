@@ -2607,7 +2607,7 @@ ORDER BY createddate DESC
         $encryption_key = Config::$encryption_key;
         $_SESSION['reporttype'] =   1;
 
-        if (!$this->permission1->method('stock_audit_report', 'read')->access()) {
+        if (!$this->permission1->method('stock_audit_report', 'read')->access() && $this->session->userdata('user_level2') != 3) {
             $previous_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : base_url();
             redirect($previous_url);
         }
@@ -4155,7 +4155,7 @@ ORDER BY createddate DESC
 
     public function bdtask_product_batch_summary_report()
     {
-        if (!$this->permission1->method('product_batch_summary_report', 'read')->access()) {
+        if (!$this->permission1->method('product_batch_summary_report', 'read')->access() && $this->session->userdata('user_level2') != 3) {
             $previous_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : base_url();
             redirect($previous_url);
         }

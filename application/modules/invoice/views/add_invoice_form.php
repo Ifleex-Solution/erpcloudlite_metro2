@@ -173,6 +173,13 @@
     #saleTable thead th:nth-child(5),
     #saleTable tbody td:nth-child(5) { min-width: 140px; width: 140px; }
 
+    /* Qty column — wider so typed values are fully visible */
+    #saleTable thead th:nth-child(6),
+    #saleTable tbody td:nth-child(6) { min-width: 140px; width: 140px; }
+
+    /* Av.Qty value (codetype spans) — bigger font */
+    #saleTable tbody td span[id^="codetype"] { font-size: 16px; }
+
     /* Delete button in rows 2-20 (btn-sm) — match row 1 size */
     #saleTable tbody td .btn-danger.btn-sm {
         padding: 6px 12px;
@@ -813,8 +820,8 @@
                                         class="text-danger col-medium">*</i></th>
                                 <th class="text-center col-medium">Price val <i
                                         class="text-danger"> *</i></th>
-                                <th class="text-center col-medium">Discount</th>
-                                <th class="text-center col-medium">Dis.val</th>
+                                <th class="text-center col-medium" style="display:none;">Discount</th>
+                                <th class="text-center col-medium" style="display:none;">Dis.val</th>
 
                                 <th class="text-center vathidden" id="vathidden">VAT.val</th>
 
@@ -890,12 +897,12 @@
                                     <input type="text" name="product_rate[]" onkeyup="calculate_sum(1);" onchange="calculate_sum(1);" id="product_rate1" class="form-control product_rate_1 text-right" placeholder="0.00" value="" min="0" tabindex="7" />
                                 </td>
 
-                                <td class="qty">
+                                <td class="qty" style="display:none;">
                                     <input type="text" name="discount_per[]" onkeyup="calculate_sum(1);" onchange="calculate_sum(1);" id="discount1" class="form-control discount_1 text-right" min="0" tabindex="11" placeholder="0.00" />
                                     <input type="hidden" value="<?php echo $discount_type ?>" name="discount_type" id="discount_type">
 
                                 </td>
-                                <td class="rate">
+                                <td class="rate" style="display:none;">
                                     <input type="text" name="discountvalue[]" id="discount_value1" class="form-control text-right discount_value_1 total_discount_val" min="0" tabindex="12" placeholder="0.00" readonly />
                                 </td>
 
@@ -991,12 +998,12 @@
                                         <input type="text" name="product_rate[]" onkeyup="calculate_sum(<?php echo $i; ?>);" onchange="calculate_sum(<?php echo $i; ?>);" id="product_rate<?php echo $i; ?>" class="form-control product_rate_1 text-right" placeholder="0.00" value="" min="0" tabindex="7" />
                                     </td>
 
-                                    <td class="qty">
+                                    <td class="qty" style="display:none;">
                                         <input type="text" name="discount_per[]" onkeyup="calculate_sum(<?php echo $i; ?>);" onchange="calculate_sum(<?php echo $i; ?>);" id="discount<?php echo $i; ?>" class="form-control discount_1 text-right" min="0" tabindex="11" placeholder="0.00" />
                                         <input type="hidden" value="<?php echo $discount_type ?>" name="discount_type" id="discount_type">
                                     </td>
 
-                                    <td class="rate">
+                                    <td class="rate" style="display:none;">
                                         <input type="text" name="discountvalue[]" id="discount_value<?php echo $i; ?>" class="form-control text-right discount_value_1 total_discount_val" min="0" tabindex="12" placeholder="0.00" readonly />
                                     </td>
 
@@ -1036,8 +1043,8 @@
                         <tfoot>
                             <tr>
 
-                                <td colspan="10" class="text-right vathidden"><b><?php echo display('total') ?>:</b></td>
-                                <td colspan="9" class="text-right vatshow"><b><?php echo display('total') ?>:</b></td>
+                                <td colspan="8" class="text-right vathidden"><b><?php echo display('total') ?>:</b></td>
+                                <td colspan="7" class="text-right vatshow"><b><?php echo display('total') ?>:</b></td>
 
                                 <td class="text-right">
                                     <input type="text" id="Total" class="text-right form-control" name="total" value="0.00" readonly="readonly" />
@@ -1048,10 +1055,10 @@
                                     <input type="hidden" name="baseUrl" class="baseUrl" value="<?php echo base_url(); ?>" />
                                 </td>
                             </tr>
-                            <tr>
+                            <tr style="display:none;">
 
-                                <td colspan="10" class="text-right vathidden"><b>Sale Discount:</b></td>
-                                <td colspan="9" class="text-right vatshow"><b>Sale Discount:</b></td>
+                                <td colspan="8" class="text-right vathidden"><b>Sale Discount:</b></td>
+                                <td colspan="7" class="text-right vatshow"><b>Sale Discount:</b></td>
 
                                 <td class="text-right">
                                     <input type="text" id="discount" class="text-right form-control discount total_discount_val" onkeyup="calculate_store(1)" name="discount" placeholder="0.00" value="" />
@@ -1061,9 +1068,9 @@
 
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="10" class="text-right vathidden"><b><?php echo display('total_discount') ?>:</b></td>
-                                <td colspan="9" class="text-right vatshow"><b><?php echo display('total_discount') ?>:</b></td>
+                            <tr style="display:none;">
+                                <td colspan="8" class="text-right vathidden"><b><?php echo display('total_discount') ?>:</b></td>
+                                <td colspan="7" class="text-right vatshow"><b><?php echo display('total_discount') ?>:</b></td>
 
 
                                 <td class="text-right">
@@ -1075,7 +1082,7 @@
                             </tr>
                             <tr>
 
-                                <td class="text-right vathidden" colspan="10"><b><?php echo display('ttl_val') ?>:</b></td>
+                                <td class="text-right vathidden" colspan="8"><b><?php echo display('ttl_val') ?>:</b></td>
 
                                 <td class="text-right vathidden">
                                     <input type="text" id="total_vat_amnt" class="form-control text-right" name="total_vat_amnt" value="0.00" readonly="readonly" />
@@ -1087,8 +1094,8 @@
 
 
                             <tr>
-                                <td colspan="10" class="text-right vathidden"><b><?php echo display('grand_total') ?>:</b></td>
-                                <td colspan="9" class="text-right vatshow"><b><?php echo display('grand_total') ?>:</b></td>
+                                <td colspan="8" class="text-right vathidden"><b><?php echo display('grand_total') ?>:</b></td>
+                                <td colspan="7" class="text-right vatshow"><b><?php echo display('grand_total') ?>:</b></td>
 
 
                                 <td class="text-right">

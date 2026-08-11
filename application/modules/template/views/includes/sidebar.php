@@ -980,6 +980,11 @@ $this->permission1->method('add_product_group', 'create')->access()
         <!-- customer menu end -->
 
         <!-- Stock menu part -->
+         <?php if (
+            $this->session->userdata('user_level2') == 3
+
+
+        ) { ?>
         <?php if (
             $this->permission1->method('add_stockbatch', 'create')->access()
             || $this->permission1->method('stockbatchlist', 'read')->access()
@@ -1044,6 +1049,7 @@ $this->permission1->method('add_product_group', 'create')->access()
 
             </li>
         <?php } ?>
+   <?php } ?>
 
 
         <?php if (
@@ -2081,11 +2087,16 @@ $this->permission1->method('add_product_group', 'create')->access()
                     <?php } ?>
 
 
+                     <?php if (
+            $this->session->userdata('user_level2') == 3
+
+
+        ) { ?>
                     <?php if (
                         $this->permission1->method('stock_report', 'read')->access() ||
                         $this->permission1->method('live_stock_report', 'read')->access() ||
                         $this->permission1->method('stock_audit_report', 'read')->access() ||
-                        $this->permission1->method('product_batch_summary_report', 'read')->access()
+                        $this->permission1->method('product_batch_summary_report', 'read')->access() 
 
 
                     ) { ?>
@@ -2151,6 +2162,7 @@ $this->permission1->method('add_product_group', 'create')->access()
                             </ul>
                         </li>
                     <?php } ?>
+                   <?php } ?>
 
                     <?php if (
                         $this->permission1->method('gross_profit_report', 'read')->access() ||
