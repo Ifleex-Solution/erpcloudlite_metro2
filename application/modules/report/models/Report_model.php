@@ -454,7 +454,7 @@ class Report_model extends CI_Model
      ($sql1)
      UNION ALL
      ($sql2)
-    ORDER BY date DESC
+    ORDER BY date ASC, invoiceno ASC
     ";
 
         $query = $this->db->query($finalQuery);
@@ -1328,7 +1328,7 @@ AND c.rdate <= '$to_date'
        ($sql1)
           UNION ALL
         ($sql2)
-        ORDER BY date DESC
+        ORDER BY date ASC, sale_id ASC
         ";
 
         $query = $this->db->query($finalQuery);
@@ -1783,7 +1783,8 @@ ORDER BY quantity DESC
             }
         }
 
-        $this->db->order_by('a.rdate', 'desc');
+        $this->db->order_by('a.rdate', 'asc');
+        $this->db->order_by('invoiceno', 'asc');
         $query = $this->db->get();
         if ($query && $query->num_rows() > 0) {
             return $query->result_array();
@@ -2629,14 +2630,8 @@ ORDER BY quantity DESC
             JOIN supplier_information b ON b.supplier_id = r.supplier_id
             WHERE r.date >= {$fromEsc} AND r.date <= {$toEsc}
               {$empFilter_r}{$supplierFilter_r}{$branchFilter_r}{$incidentFilter_r}
-            ORDER BY date DESC
+            ORDER BY date ASC, invoiceno ASC
         ";
-
-        $logFilePath = 'logfile.log';
-        $fileHandle = fopen($logFilePath, 'a');
-        $logMessage = json_encode($sql);
-        fwrite($fileHandle, $logMessage . "\n");
-        fclose($fileHandle);
 
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {

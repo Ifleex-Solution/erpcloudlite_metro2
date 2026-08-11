@@ -137,7 +137,7 @@
                                 <td class="text-center"></td>
                             </tr>
 
-                            <?php for ($i = 2; $i <= 20; $i++) { ?>
+                            <?php for ($i = 2; $i <= 30; $i++) { ?>
                                 <tr id="myRow<?php echo $i; ?>">
                                     <td class="product_field">
                                         <select name="product[]" class="form-control" id="product<?php echo $i; ?>" tabindex="1" onchange="product_search(<?php echo $i; ?>, 'product')">
@@ -214,7 +214,7 @@ echo "</script>";
     $(document).ready(function() {
         $('select.form-control').select2('destroy').select2({placeholder: 'Select option', allowClear: true});
 
-        for (let j = 2; j <= 20; j++) {
+        for (let j = 2; j <= 30; j++) {
             document.getElementById('myRow' + j).style.display = 'none';
         }
 

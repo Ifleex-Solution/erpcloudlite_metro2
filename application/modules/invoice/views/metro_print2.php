@@ -252,7 +252,7 @@
         </th>
         <th style="width: 10px;text-align: left;"> <span class="text-item2"></span></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
-                    <?php echo $customer_name ?>
+                    <?php echo ($this->session->userdata('user_level2') == 3) ? "." : $customer_name ?>
                 </span></b></th>
     </tr>
     <tr class="row-lg1">
@@ -261,7 +261,7 @@
         </th>
         <th style="width: 200px;"></th>
         <th style="width:200px; text-align: left;"><b><span class="text-item2">
-                    <?php echo $customer_address; ?>
+                    <?php echo ($this->session->userdata('user_level2') == 3) ? "." : $customer_address; ?>
                 </span></b></th>
     </tr>
     <tr class="row-xs">
@@ -271,7 +271,11 @@
         <th style="width: 10px;"></th>
         <th style="width:200px; text-align: left;">
             <b>
-                <?php if (!empty($customer_mobile)) { ?>
+                <?php if ($this->session->userdata('user_level2') == 3) { ?>
+                    <span class="text-item2" style="color: white; background-color: white;">
+                        .
+                    </span>
+                <?php } elseif (!empty($customer_mobile)) { ?>
                     <span class="text-item2">
                         <?php echo $customer_mobile; ?>
                     </span>
