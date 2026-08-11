@@ -1969,7 +1969,10 @@ echo "</script>";
 
                 }
 
+                var rowReadyPromises = [];
+
                 groupdetails.forEach(function(group) {
+                    var rowItem = count;
                     document.getElementById('product' + count).value = group.product
                     document.getElementById('productInput' + count).value = group.product_name
                     document.getElementById('groupId' + count).value = group.pid
@@ -1989,14 +1992,16 @@ echo "</script>";
                     row.style.display = 'table-row';
                     row.style.backgroundColor = colors[colorIndex];
                     getActiveStore(0, count);
-                    product_group_search(count, 'group', group.unit, group.unit_name)
+                    rowReadyPromises.push(new Promise(function(resolve) {
+                        product_group_search(rowItem, 'group', group.unit, group.unit_name, resolve);
+                    }));
                     count = count + 1;
 
 
 
                 });
 
-                setTimeout(() => {
+                Promise.all(rowReadyPromises).then(() => {
                     groupdetails.forEach(function(group) {
 
                         document.getElementById('qty' + countPrevious).value = group.qty;
@@ -2004,8 +2009,7 @@ echo "</script>";
                         countPrevious = countPrevious + 1;
 
                     });
-
-                }, 6000);
+                });
 
                 colorIndex++;
 
@@ -2397,7 +2401,7 @@ echo "</script>";
         }
     }
 
-    function product_group_search(item, name, groupUnitId, groupUnitName) {
+    function product_group_search(item, name, groupUnitId, groupUnitName, onDone) {
         if (name === "group") {
             document.getElementById('qty' + item).value = "";
             document.getElementById('code' + item).value = "";
@@ -2447,13 +2451,14 @@ echo "</script>";
 
 
 
-                                getActiveSubUnitForGroup(document.getElementById('product' + item).value, item, groupUnitId, groupUnitName)
+                                getActiveSubUnitForGroup(document.getElementById('product' + item).value, item, groupUnitId, groupUnitName, onDone)
 
 
                                 //   document.getElementById('unit' + item).value = product[0].unit;
                             },
                             error: function(error) {
                                 console.log(error)
+                                if (onDone) onDone();
                             }
                         }), 1000);
                     getActiveStore(product[0].store, item);
@@ -2506,6 +2511,7 @@ echo "</script>";
                 },
                 error: function(error) {
                     console.log(error)
+                    if (onDone) onDone();
                 }
             });
         }
@@ -3481,7 +3487,7 @@ echo "</script>";
         });
     }
 
-    function getActiveSubUnitForGroup(productId, item, groupUnitId, groupUnitName) {
+    function getActiveSubUnitForGroup(productId, item, groupUnitId, groupUnitName, onDone) {
         $.ajax({
             url: $('#base_url').val() + 'product/product/active_subunitsbyproductId',
             type: 'POST',
@@ -3512,7 +3518,9 @@ echo "</script>";
 
 
                 if (document.getElementById('isstock' + item).value == 1) {
-                    convertion(item, document.getElementById('product' + item).value, groupUnitId, groupUnitName)
+                    convertion(item, document.getElementById('product' + item).value, groupUnitId, groupUnitName, onDone)
+                } else {
+                    if (onDone) onDone();
                 }
 
 
@@ -3524,6 +3532,7 @@ echo "</script>";
             },
             error: function(error) {
                 console.log(error)
+                if (onDone) onDone();
             }
         });
     }
@@ -3696,7 +3705,7 @@ echo "</script>";
     }
 
 
-    function convertion(item, product, unit, unitname) {
+    function convertion(item, product, unit, unitname, onDone) {
 
         // if (unitname.split("-")[1] == "S") {
         $.ajax({
@@ -3741,10 +3750,12 @@ echo "</script>";
                     getActiveSubUnit(document.getElementById('product' + item).value, item)
                     avStock(item, document.getElementById('product' + item).value, document.getElementById('store' + item).value, document.getElementById('batch' + item).value, "", "")
                 }
+                if (onDone) onDone();
 
             },
             error: function(error) {
                 console.log(error)
+                if (onDone) onDone();
             }
         });
         // } else {
