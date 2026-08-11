@@ -897,6 +897,7 @@ class Report extends MX_Controller
         $patotal = 0;
         $total = 0;
         $fill = false;
+        $lastDate = null;
         foreach ($data as $row) {
 
             if ($pdf->GetY() + $lineHeight > $maxY) {
@@ -917,6 +918,7 @@ class Report extends MX_Controller
                 $pdf->Cell(40, 7, 'Amount', 1, 0, 'R', true);
                 $pdf->Ln();
                 $pdf->SetTextColor(30, 41, 59);
+                $lastDate = null;
             }
             $total = $total + $row['total'];
             $patotal = $patotal + $row['total'];
@@ -928,7 +930,9 @@ class Report extends MX_Controller
             } else {
                 $pdf->SetFillColor(255, 255, 255);
             }
-            $pdf->Cell(45, 8, $row['date'], 1, 0, 'L', true);
+            $dateDisplay = ($row['date'] === $lastDate) ? '' : $row['date'];
+            $lastDate = $row['date'];
+            $pdf->Cell(45, 8, $dateDisplay, 1, 0, 'L', true);
             $pdf->Cell(33, 8,  $row['invoiceno'], 1, 0, 'L', true);
             $pdf->Cell(40, 8,  $row['incidenttype'], 1, 0, 'L', true);
             $pdf->Cell(35, 8,  $row['customer_name'], 1, 0, 'L', true);
@@ -986,6 +990,7 @@ class Report extends MX_Controller
         $patotal = 0;
         $total = 0;
         $fill = false;
+        $lastDate = null;
 
         foreach ($data as $row) {
 
@@ -1007,6 +1012,7 @@ class Report extends MX_Controller
                 $pdf->Cell(40, 7, 'Amount', 1, 0, 'R', true);
                 $pdf->Ln();
                 $pdf->SetTextColor(30, 41, 59);
+                $lastDate = null;
             }
             $patotal = $patotal + $row['total'];
             $total = $total + $row['total'];
@@ -1018,7 +1024,9 @@ class Report extends MX_Controller
             } else {
                 $pdf->SetFillColor(255, 255, 255);
             }
-            $pdf->Cell(45, 8, $row['date'], 1, 0, 'L', true);
+            $dateDisplay = ($row['date'] === $lastDate) ? '' : $row['date'];
+            $lastDate = $row['date'];
+            $pdf->Cell(45, 8, $dateDisplay, 1, 0, 'L', true);
             $pdf->Cell(33, 8,  $row['invoiceno'], 1, 0, 'L', true);
             $pdf->Cell(40, 8,  $row['incidenttype'], 1, 0, 'L', true);
             $pdf->Cell(35, 8,  $row['supplier_name'], 1, 0, 'L', true);
@@ -1083,6 +1091,8 @@ class Report extends MX_Controller
         $patotal = 0;
         $total = 0;
         $fill = false;
+        $lastDate = null;
+        $lastInvoice = null;
 
         foreach ($data as $row) {
 
@@ -1107,6 +1117,8 @@ class Report extends MX_Controller
                 $pdf->Cell(27, 7, 'Total', 1, 0, 'R', true);
                 $pdf->Ln();
                 $pdf->SetTextColor(30, 41, 59);
+                $lastDate = null;
+                $lastInvoice = null;
             }
             $patotal = $patotal + $row['total'];
             $total = $total + $row['total'];
@@ -1118,9 +1130,13 @@ class Report extends MX_Controller
             } else {
                 $pdf->SetFillColor(255, 255, 255);
             }
-            $pdf->MultiCell(24, 8, $row['date'], 1, 'L', true, 0);
+            $dateDisplay = ($row['date'] === $lastDate) ? '' : $row['date'];
+            $lastDate = $row['date'];
+            $invoiceDisplay = ($row['sale_id'] === $lastInvoice) ? '' : $row['sale_id'];
+            $lastInvoice = $row['sale_id'];
+            $pdf->MultiCell(24, 8, $dateDisplay, 1, 'L', true, 0);
             $pdf->MultiCell(36, 8,  $row['product_name'], 1, 'L', true, 0);
-            $pdf->MultiCell(23, 8,  $row['sale_id'], 1, 'L', true, 0);
+            $pdf->MultiCell(23, 8,  $invoiceDisplay, 1, 'L', true, 0);
             $pdf->MultiCell(22, 8,  $row['incidenttype'], 1, 'L', true, 0);
             $pdf->MultiCell(15, 8,  $row['customer_name'], 1, 'L', true, 0);
             $pdf->MultiCell(27, 8, number_format($row['product_rate'], 2), 1, 'R', true, 0);
@@ -3123,6 +3139,7 @@ ORDER BY createddate DESC
         $maxY       = 270;
         $patotal    = 0;
         $total      = 0;
+        $lastDate   = null;
 
         foreach ($data as $row) {
             if ($pdf->GetY() + $lineHeight > $maxY) {
@@ -3143,6 +3160,7 @@ ORDER BY createddate DESC
                 $pdf->Cell(25, 7, 'Amount',        1, 0, 'R', true);
                 $pdf->Ln();
                 $pdf->SetTextColor(30, 41, 59);
+                $lastDate = null;
             }
             $total   += (float)$row['total'];
             $patotal += (float)$row['total'];
@@ -3150,7 +3168,9 @@ ORDER BY createddate DESC
             $pdf->SetFont('helvetica', '', 7.5);
             $pdf->SetDrawColor(203, 213, 225);
             if ($fill) { $pdf->SetFillColor(248, 250, 252); } else { $pdf->SetFillColor(255, 255, 255); }
-            $pdf->Cell(35, 8, $row['date'],          1, 0, 'L', true);
+            $dateDisplay = ($row['date'] === $lastDate) ? '' : $row['date'];
+            $lastDate = $row['date'];
+            $pdf->Cell(35, 8, $dateDisplay,          1, 0, 'L', true);
             $pdf->Cell(35, 8, $row['return_id'],     1, 0, 'L', true);
             $pdf->Cell(35, 8, $row['invoiceno'],     1, 0, 'L', true);
             $pdf->Cell(55, 8, $row['customer_name'], 1, 0, 'L', true);

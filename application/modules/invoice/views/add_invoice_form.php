@@ -180,7 +180,7 @@
     /* Av.Qty value (codetype spans) — bigger font */
     #saleTable tbody td span[id^="codetype"] { font-size: 16px; }
 
-    /* Delete button in rows 2-20 (btn-sm) — match row 1 size */
+    /* Delete button in rows 2-30 (btn-sm) — match row 1 size */
     #saleTable tbody td .btn-danger.btn-sm {
         padding: 6px 12px;
         font-size: 14px;
@@ -931,7 +931,7 @@
                             </tr>
 
                             <?php
-                            for ($i = 2; $i <= 20; $i++) {
+                            for ($i = 2; $i <= 30; $i++) {
                             ?>
                                 <tr id="myRow<?php echo $i; ?>">
                                     <td class="product_field">
@@ -1357,7 +1357,7 @@ echo "</script>";
         $invoiceTypeDropdown.val('cash');
 
 
-        for (let j = 2; j <= 20; j++) {
+        for (let j = 2; j <= 30; j++) {
             document.getElementById('myRow' + j).style.display = 'none';
             document.getElementById('isparent' + j).style.display = 'none';
         }
@@ -3042,7 +3042,7 @@ echo "</script>";
     }
 
     function clearDetails2() {
-        for (let i = 1; i < 20; i++) {
+        for (let i = 1; i < 30; i++) {
             // var $productDropdown = $('#product' + i);
             // $productDropdown.empty();
             // $productDropdown.append('<option value="" disabled selected>Select Product</option>'); // Add default option
@@ -3336,7 +3336,7 @@ echo "</script>";
     }
 
     function clearDetails() {
-        for (let i = 1; i < 20; i++) {
+        for (let i = 1; i < 30; i++) {
 
             var $storeDropdown = $('#store' + i);
             $storeDropdown.empty();
