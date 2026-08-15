@@ -1,55 +1,56 @@
-<div class="row">
+<style>
+    .panel.panel-bd.lobidrag { border:none !important; box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06) !important; border-radius:14px !important; overflow:hidden !important; }
+    .panel.panel-bd.lobidrag .panel-heading { background:#fff !important; padding:14px 24px !important; border:none !important; border-bottom:2px solid #F1F5F9 !important; }
+    .panel.panel-bd.lobidrag .panel-title { display:flex !important; align-items:center !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:10px !important; margin:0 !important; }
+    .panel.panel-bd.lobidrag .panel-body { padding:20px !important; background:#fff !important; margin-left:0 !important; }
+    .panel.panel-bd.lobidrag .form-group { margin-bottom:16px !important; max-width:280px; margin-left:20px; }
+    .panel.panel-bd.lobidrag label { font-size:13px !important; font-weight:600 !important; color:#374151 !important; display:block; margin-bottom:4px !important; }
+    .panel.panel-bd.lobidrag .form-control { border:1.5px solid #E2E8F0 !important; border-radius:8px !important; padding:8px 12px !important; font-size:13px !important; color:#374151 !important; background:#F8FAFC !important; height:auto !important; transition:border-color .16s,box-shadow .16s,background .16s !important; width:100% !important; }
+    .panel.panel-bd.lobidrag .form-control:focus { border-color:#16A34A !important; background:#fff !important; box-shadow:0 0 0 3px rgba(22,163,74,.12) !important; outline:none !important; }
+    .panel.panel-bd.lobidrag .btn.btn-success { background:#16A34A !important; border:none !important; border-radius:8px !important; padding:9px 24px !important; font-size:13px !important; font-weight:600 !important; color:#fff !important; letter-spacing:.3px !important; transition:background .16s,box-shadow .16s !important; }
+    .panel.panel-bd.lobidrag .btn.btn-success:hover { background:#15803D !important; box-shadow:0 4px 12px rgba(22,163,74,.30) !important; }
+    .cb-search-panel .report-btn-row { margin-left:20px; margin-top:8px; }
+    @media (max-width:576px) {
+        .panel.panel-bd.lobidrag .panel-body { padding:16px !important; }
+        .panel.panel-bd.lobidrag .form-group { max-width:100% !important; margin-left:0 !important; }
+        .cb-search-panel .report-btn-row { margin-left:0; }
+    }
+</style>
+<div class="row cb-search-panel">
     <div class="col-sm-12 col-md-12">
-        <div class="panel panel-bd">
+        <div class="panel panel-bd lobidrag">
             <div class="panel-heading">
                 <div class="panel-title">
-                    <h4>
-                        <?php echo display('cash_book')?>
-                    </h4>
+                    <h4><?php echo display('cash_book')?></h4>
                 </div>
             </div>
             <div class="panel-body">
-                <?php echo  form_open_multipart('','id="form1" name="form1"') ?>
-                <div class="row" id="">
-                    <div class="col-sm-6">
-                        <div class="form-group row">
-                            <label for="date" class="col-sm-4 col-form-label"><?php echo display('cash')?></label>
-                            <div class="col-sm-8">
-
-                                <select name="cmbCode" class="form-control" id="cmbCode">
-                                    <option value="">Select Bank</option>
-                                    <?php  foreach($cashs as $cash) { echo $cash->HeadName; ?>
-                                    <option value="<?php echo $cash->HeadCode;?>"
-                                        <?php echo $cash->HeadCode==$cmbCode? 'selected' :'';?>>
-                                        <?php echo $cash->HeadName;?></option>
-
-                                    <?php  }   ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="date" class="col-sm-4 col-form-label"><?php echo display('from_date') ?></label>
-                            <div class="col-sm-8">
-                                <input type="text" name="dtpFromDate"
-                                    value="<?php echo (!empty($dtpFromDate)?$dtpFromDate:'')?>"
-                                    placeholder="<?php echo display('date') ?>" class="datepicker form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="date" class="col-sm-4 col-form-label"><?php echo display('to_date') ?></label>
-                            <div class="col-sm-8">
-                                <input type="text" name="dtpToDate"
-                                    value="<?php echo (!empty($dtpToDate)?$dtpToDate:'')?>"
-                                    placeholder="<?php echo display('date') ?>" class="datepicker form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group form-group-margin text-right">
-                            <button type="submit" name="btnSave"
-                                class="btn btn-success w-md m-b-5"><?php echo display('find') ?></button>
-                        </div>
-                    </div>
+                <?php echo form_open_multipart('', 'id="form1" name="form1"') ?>
+                <div class="form-group">
+                    <label><?php echo display('cash')?></label>
+                    <select name="cmbCode" class="form-control" id="cmbCode">
+                        <option value="">Select Bank</option>
+                        <?php foreach ($cashs as $cash) { ?>
+                        <option value="<?php echo $cash->HeadCode; ?>"
+                            <?php echo $cash->HeadCode == $cmbCode ? 'selected' : ''; ?>>
+                            <?php echo $cash->HeadName; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><?php echo display('from_date') ?></label>
+                    <input type="text" name="dtpFromDate"
+                        value="<?php echo (!empty($dtpFromDate) ? $dtpFromDate : '') ?>"
+                        placeholder="<?php echo display('date') ?>" class="datepicker form-control">
+                </div>
+                <div class="form-group">
+                    <label><?php echo display('to_date') ?></label>
+                    <input type="text" name="dtpToDate"
+                        value="<?php echo (!empty($dtpToDate) ? $dtpToDate : '') ?>"
+                        placeholder="<?php echo display('date') ?>" class="datepicker form-control">
+                </div>
+                <div class="report-btn-row">
+                    <button type="submit" name="btnSave" class="btn btn-success"><?php echo display('find') ?></button>
                 </div>
                 <?php echo form_close() ?>
             </div>

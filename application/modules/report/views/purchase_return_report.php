@@ -1,20 +1,54 @@
 <!-- Purchase Return Report -->
 <style>
-	input[type="password"]::-ms-reveal,
-	input[type="password"]::-ms-clear {
-		display: none;
-	}
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear { display: none; }
+    #btn-filter { position:relative; min-width:145px; transition:opacity .2s; }
+    #btn-filter.btn-loading { color:transparent !important; pointer-events:none; opacity:.85; }
+    #btn-filter.btn-loading::after { content:''; position:absolute; top:50%; left:50%; width:20px; height:20px; border-radius:50%; background:conic-gradient(#fff 0deg,rgba(255,255,255,.6) 100deg,rgba(255,255,255,.15) 200deg,transparent 300deg); -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px)); mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px)); animation:btn_spin .75s linear infinite; }
+    @keyframes btn_spin { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+    .panel.panel-bd.lobidrag { border:none !important; box-shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06) !important; border-radius:14px !important; overflow:hidden !important; }
+    .panel.panel-bd.lobidrag .panel-heading { background:#fff !important; padding:14px 24px !important; border:none !important; border-bottom:2px solid #F1F5F9 !important; }
+    .panel.panel-bd.lobidrag .panel-title { display:flex !important; align-items:center !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:10px !important; margin:0 !important; }
+    .panel.panel-bd.lobidrag .panel-body { padding:20px !important; background:#fff !important; margin-left:0 !important; }
+    .panel.panel-bd.lobidrag .form-group { margin-bottom:16px !important; max-width:280px; margin-left:20px; }
+    .panel.panel-bd.lobidrag label { font-size:13px !important; font-weight:600 !important; color:#374151 !important; display:block; margin-bottom:4px !important; }
+    .panel.panel-bd.lobidrag .form-control { border:1.5px solid #E2E8F0 !important; border-radius:8px !important; padding:8px 12px !important; font-size:13px !important; color:#374151 !important; background:#F8FAFC !important; height:auto !important; transition:border-color .16s,box-shadow .16s,background .16s !important; }
+    .panel.panel-bd.lobidrag .form-control:focus { border-color:#16A34A !important; background:#fff !important; box-shadow:0 0 0 3px rgba(22,163,74,.12) !important; outline:none !important; }
+    .panel.panel-bd.lobidrag .btn.btn-success { background:#16A34A !important; border:none !important; border-radius:8px !important; padding:9px 24px !important; font-size:13px !important; font-weight:600 !important; color:#fff !important; letter-spacing:.3px !important; transition:background .16s,box-shadow .16s !important; }
+    .panel.panel-bd.lobidrag .btn.btn-success:hover { background:#15803D !important; box-shadow:0 4px 12px rgba(22,163,74,.30) !important; }
+    .select2-container .select2-selection--single { border:1.5px solid #E2E8F0 !important; border-radius:8px !important; background:#F8FAFC !important; height:38px !important; }
+    .select2-container .select2-selection--single .select2-selection__rendered { color:#374151 !important; font-size:13px !important; line-height:36px !important; padding-left:10px !important; }
+    .select2-container .select2-selection--single .select2-selection__arrow { height:36px !important; }
+    .select2-container--default.select2-container--focus .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--single { border-color:#16A34A !important; background:#fff !important; box-shadow:0 0 0 3px rgba(22,163,74,.12) !important; }
+    .select2-dropdown { border:1.5px solid #E2E8F0 !important; border-radius:8px !important; box-shadow:0 4px 16px rgba(0,0,0,.10) !important; margin-top:2px !important; }
+    .select2-search--dropdown .select2-search__field { border:1.5px solid #E2E8F0 !important; border-radius:6px !important; font-size:13px !important; padding:5px 8px !important; }
+    .select2-results__option { font-size:13px !important; padding:7px 12px !important; color:#374151 !important; }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] { background:#16A34A !important; color:#fff !important; }
+    .select2-container--default .select2-results__option[aria-selected=true] { background:#F0FDF4 !important; color:#16A34A !important; }
+    .panel.panel-bd.lobidrag .panel-body .input-group,
+    .panel.panel-bd.lobidrag .panel-body .form-control { width:100% !important; max-width:100% !important; }
+    .panel.panel-bd.lobidrag .panel-body > .form-group[style*="flex"] { display:flex !important; flex-direction:row !important; flex-wrap:wrap !important; gap:14px 20px !important; max-width:600px !important; }
+    .panel.panel-bd.lobidrag .panel-body > .form-group[style*="flex"] > div { flex:1 1 130px; max-width:200px; }
+    .panel.panel-bd.lobidrag .panel-body > .form-group[style*="margin-bottom"] { max-width:100% !important; }
+    .report-btn-row { margin-left:20px; margin-top:8px; }
+    @media (max-width:576px) {
+        .panel.panel-bd.lobidrag .panel-body { padding:16px !important; }
+        .panel.panel-bd.lobidrag .panel-body > .form-group { max-width:100% !important; margin-left:0 !important; }
+        .panel.panel-bd.lobidrag .panel-body > .form-group[style*="flex"] > div { max-width:100% !important; }
+        .report-btn-row { margin-left:0; }
+    }
 </style>
 <div class="row">
-	<div class="col-sm-12">
-		<div class="panel panel-bd lobidrag">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<h4><?php echo $title; ?></h4>
-				</div>
-			</div>
-			<br />
-			<div class="panel-body" style="margin-left: 120px;">
+    <div class="col-sm-12">
+        <div class="panel panel-bd lobidrag">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <h4><?php echo $title; ?></h4>
+                </div>
+            </div>
+            <br />
+            <div class="panel-body">
 
 				<?php
 				date_default_timezone_set('Asia/Colombo');
@@ -62,12 +96,14 @@
 
 				</div>
 
-				<button type="button" id="btn-filter" class="btn btn-success" onclick="onPurchaseReturnFilterButtonClick()">
-					Generate Report
-				</button>
-			</div>
-		</div>
-	</div>
+                <div class="report-btn-row">
+                    <button type="button" id="btn-filter" class="btn btn-success" onclick="onPurchaseReturnFilterButtonClick()">
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <input type="hidden" name="baseUrl2" id="baseUrl2" class="baseUrl" value="<?php echo base_url(); ?>" />
