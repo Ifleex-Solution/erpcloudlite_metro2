@@ -1709,7 +1709,11 @@ GROUP By pi.id";
     public function set_stock_session()
     {
         $stock_report = json_decode($this->input->post('datas'), true) ?: [];
-        $_SESSION['stock_report'] = $stock_report;
+        $_SESSION['stock_report']    = $stock_report;
+        $_SESSION['sr_stocktype']    = $this->input->post('stocktype')  ?: 'all';
+        $_SESSION['sr_title']        = $this->input->post('title')      ?: 'Stock Report';
+        $_SESSION['sr_from_date']    = $this->input->post('from_date')  ?: '';
+        $_SESSION['sr_to_date']      = $this->input->post('to_date')    ?: '';
         echo json_encode("");
     }
 
@@ -2180,342 +2184,176 @@ ORDER BY createddate DESC
 
     public function generate_stockreport()
     {
-        $page = 1;
+        @ini_set('memory_limit', '512M');
+
+        $data      = isset($_SESSION['stock_report'])  ? $_SESSION['stock_report']  : [];
+        $stocktype = isset($_SESSION['sr_stocktype'])  ? $_SESSION['sr_stocktype']  : 'all';
+        $title     = isset($_SESSION['sr_title'])      ? $_SESSION['sr_title']      : 'Stock Report';
+        $from_date = isset($_SESSION['sr_from_date'])  ? $_SESSION['sr_from_date']  : '';
+        $to_date   = isset($_SESSION['sr_to_date'])    ? $_SESSION['sr_to_date']    : '';
+
+        if (empty($data)) {
+            http_response_code(400);
+            echo 'No data';
+            return;
+        }
+
         $pdf = new StockReport('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Your Name');
-        $pdf->SetTitle($_SESSION['header']);
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, columns, example');
-        $top_margin = 5;
-        $pdf->SetMargins(7, $top_margin, 10);
-        $pdf->SetAutoPageBreak(TRUE, 20);
+        $pdf->SetTitle($title);
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 15);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 10);
 
-        $this->header($pdf, $page,  $_SESSION['header'], $_SESSION['sr_istype'], $_SESSION['srfrom_date'], $_SESSION['srto_date']);
+        $hdr_type = (!empty($from_date) || !empty($to_date)) ? 'false' : '';
+        $this->header($pdf, 1, $title, $hdr_type, $from_date, $to_date);
 
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
+        // Column definitions based on stocktype
+        if ($stocktype === 'actualstock') {
+            $cols    = [10, 32, 48, 25, 25, 28, 25, 25, 30, 29];
+            $headers = ['Sl', 'Category', 'Product Name',
+                        'In.Qty', 'Out.Qty', 'Avl.Qty',
+                        'Purch.Price', 'Sale Price', 'Purch.Val', 'Sale Val'];
+        } elseif ($stocktype === 'physicalstock') {
+            $cols    = [10, 35, 60, 35, 35, 37, 32, 33];
+            $headers = ['Sl', 'Category', 'Product Name',
+                        'In.Qty', 'Out.Qty', 'Avl.Qty',
+                        'Purch.Price', 'Sale Price'];
+        } else { // all
+            $cols    = [8, 28, 40, 18, 18, 20, 18, 18, 20, 20, 20, 24, 23];
+            $headers = ['Sl', 'Category', 'Product Name',
+                        'Act.In', 'Act.Out', 'Act.Avl',
+                        'Phy.In', 'Phy.Out', 'Phy.Avl',
+                        'Purch.Price', 'Sale Price', 'Purch.Val', 'Sale Val'];
         }
 
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-        }
+        $drawHeader = function() use ($pdf, $cols, $headers) {
+            $pdf->SetFont('helvetica', 'B', 7.5);
+            $pdf->SetFillColor(51, 65, 85);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetDrawColor(148, 163, 184);
+            $pdf->SetLineWidth(0.2);
+            foreach ($headers as $i => $h) {
+                $align = ($i >= count($headers) - 2) ? 'R' : (($i <= 2) ? 'L' : 'C');
+                $pdf->Cell($cols[$i], 7, $h, 1, 0, $align, true);
+            }
+            $pdf->Ln();
+            $pdf->SetTextColor(30, 41, 59);
+        };
 
-        $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->Cell(15, 10, '', 'TL', 0, 'L', 0, '', 1);
-        $pdf->Cell(65, 10, 'Product Information', 'TL', 0, 'C', 0, '', 1);
+        $drawHeader();
 
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(60, 10, 'Actual Stock', 'TL', 0, 'C', 0, '', 1);
-        }
+        // Draws one table row using MultiCell so long category/product names wrap
+        // onto extra lines instead of being clipped, with the row height grown to fit.
+        $calcRowHeight = function ($catText, $prodText) use ($pdf, $cols) {
+            $lineH    = 4.2;
+            $numLines = max(
+                $pdf->getNumLines((string)$catText,  $cols[1]),
+                $pdf->getNumLines((string)$prodText, $cols[2]),
+                1
+            );
+            return max($numLines * $lineH, 6);
+        };
+        $drawRow = function (array $values, array $aligns, $rowH) use ($pdf, $cols) {
+            $x0 = $pdf->GetX();
+            $y0 = $pdf->GetY();
+            foreach ($values as $idx => $val) {
+                $pdf->MultiCell($cols[$idx], $rowH, (string)$val, 1, $aligns[$idx], true, 0);
+            }
+            $pdf->SetXY($x0, $y0 + $rowH);
+        };
 
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->Cell(60, 10, 'Physical Stock', 'TL', 0, 'C', 0, '', 1);
-        }
-
-        $pdf->Cell(12, 10, '', 'TL', 0, 'L', 0, '', 1);
-
-        $pdf->Cell(30, 10, 'Unit Price', 'TR', 0, 'L', 0, '', 1);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(12, 10, '', 'TL', 0, 'L', 0, '', 1);
-
-            $pdf->Cell(30, 10, 'Stock Value', 'TR', 0, 'L', 0, '', 1);
-        }
-
-
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'B', 8);
-
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        $pdf->MultiCell(15, 10, 'Sl', 'TLB', 'C', 0, 0);
-        $pdf->MultiCell(30, 10, 'Category', 'TLB', 'L', 0, 0);
-        $pdf->MultiCell(35, 10, 'Product Name', 'TLB', 'L', 0, 0);
-        // $pdf->MultiCell(15, 10, 'Unit', 'TLB', 'C', 0, 0);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->MultiCell(20, 10, "In.Qty", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(20, 10, "Out.Qty", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(20, 10, "Avl.Qty", 'TLB', 'C', 0, 0);
-        }
-
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->MultiCell(20, 10, "In.Qty", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(20, 10, "Out.Qty", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(20, 10, "Avl.Qty", 'TLB', 'C', 0, 0);
-        }
-
-        $pdf->MultiCell(21, 10, "Purchase Price", 'TLB', 'C', 0, 0);
-        $pdf->MultiCell(21, 10, "Sale Price", 'TLBR', 'C', 0, 0);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->MultiCell(21, 10, "Act.Stock Purchase Val", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(21, 10, "Act.Stock Sale Val", 'TLBR', 'C', 0, 0);
-        }
-
-        $data =  $_SESSION['stock_report'];
-        $lineHeight = 10;
-        $maxY = 270;
-
-
-
-        $patotal = 0;
-        $total = 0;
+        $fill               = false;
+        $maxY               = $pdf->GetPageHeight() - 18;
+        $i                  = 1;
         $grand_purchase_val = 0;
-        $grand_sale_val = 0;
-        $pdf->SetFont('helvetica', '', 8);
-        $i = 1;
+        $grand_sale_val     = 0;
 
         foreach ($data as $row) {
-            $pdf->Ln(10);
-
-            if ($_SESSION['sr_istype2'] == "actualstock") {
-                $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
-            }
-
-            if ($_SESSION['sr_istype2'] == "physicalstock") {
-                $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-            }
-
-            $pdf->Cell(15, 10, $i, 'TLB', 0, 'C', 0, '', 1);
-            $pdf->Cell(30, 10, $row['category_name'], 'TLB', 0, 'L', 0, '', 1);
-            $pdf->Cell(35, 10, $row['product_name'], 'TLB', 0, 'L', 0, '', 1);
-
-            if ($_SESSION['sr_istype2'] != "physicalstock") {
-                $pdf->MultiCell(20, 10, $row['inqty'], 'TLB', 'C', 0, 0);
-                $pdf->MultiCell(20, 10, $row['outqty'], 'TLB', 'C', 0, 0);
-                $pdf->MultiCell(20, 10, $row['avqty'], 'TLB', 'C', 0, 0);
-            }
-
-            if ($_SESSION['sr_istype2'] != "actualstock") {
-                $pdf->MultiCell(20, 10, $row['pinqty'], 'TLB', 'C', 0, 0);
-                $pdf->MultiCell(20, 10, $row['poutqty'], 'TLB', 'C', 0, 0);
-                $pdf->MultiCell(20, 10, $row['pavqty'], 'TLB', 'C', 0, 0);
-            }
-
-            $purchase_price = $row['stockunittype'] == "master" ? (is_numeric($row['purchase_price']) ? $row['purchase_price'] : 0) : (is_numeric($row['subpurchase_price']) ? $row['subpurchase_price'] : 0);
-            $sale_price     = $row['stockunittype'] == "master" ? (is_numeric($row['sale_price']) ? $row['sale_price'] : 0) : (is_numeric($row['subsale_price']) ? $row['subsale_price'] : 0);
-            $avqty          = is_numeric($row['avqtymain']) ? $row['avqtymain'] : 0;
-
-            $total_purchase = $purchase_price * $avqty;
-            $total_sale     = $sale_price * $avqty;
-
+            $purchase_price = ($row['stockunittype'] === 'master')
+                ? (is_numeric($row['purchase_price'])    ? (float)$row['purchase_price']    : 0)
+                : (is_numeric($row['subpurchase_price']) ? (float)$row['subpurchase_price'] : 0);
+            $sale_price = ($row['stockunittype'] === 'master')
+                ? (is_numeric($row['sale_price'])    ? (float)$row['sale_price']    : 0)
+                : (is_numeric($row['subsale_price']) ? (float)$row['subsale_price'] : 0);
+            $avqtymain      = is_numeric($row['avqtymain']) ? (float)$row['avqtymain'] : 0;
+            $total_purchase = $purchase_price * $avqtymain;
+            $total_sale     = $sale_price     * $avqtymain;
             $grand_purchase_val += $total_purchase;
             $grand_sale_val     += $total_sale;
 
-            $pdf->Cell(21, 10, number_format($purchase_price, 2), 'TLB', 0, 'C');
-            $pdf->Cell(21, 10, number_format($sale_price, 2), 'TLBR', 0, 'C');
-
-            if ($_SESSION['sr_istype2'] != "physicalstock") {
-                $pdf->Cell(21, 10, number_format($total_purchase, 2), 'TLB', 0, 'C');
-                $pdf->Cell(21, 10, number_format($total_sale, 2), 'TLBR', 0, 'C');
+            if ($stocktype === 'actualstock') {
+                $values = [$i, $row['category_name'], $row['product_name'], $row['inqty'], $row['outqty'], $row['avqty'],
+                           number_format($purchase_price, 2), number_format($sale_price, 2),
+                           number_format($total_purchase, 2), number_format($total_sale, 2)];
+                $aligns = ['L', 'L', 'L', 'C', 'C', 'C', 'R', 'R', 'R', 'R'];
+            } elseif ($stocktype === 'physicalstock') {
+                $values = [$i, $row['category_name'], $row['product_name'], $row['pinqty'], $row['poutqty'], $row['pavqty'],
+                           number_format($purchase_price, 2), number_format($sale_price, 2)];
+                $aligns = ['L', 'L', 'L', 'C', 'C', 'C', 'R', 'R'];
+            } else { // all
+                $values = [$i, $row['category_name'], $row['product_name'], $row['inqty'], $row['outqty'], $row['avqty'],
+                           $row['pinqty'], $row['poutqty'], $row['pavqty'],
+                           number_format($purchase_price, 2), number_format($sale_price, 2),
+                           number_format($total_purchase, 2), number_format($total_sale, 2)];
+                $aligns = ['L', 'L', 'L', 'C', 'C', 'C', 'C', 'C', 'C', 'R', 'R', 'R', 'R'];
             }
-            $i = $i + 1;
+
+            $rowH = $calcRowHeight($row['category_name'], $row['product_name']);
+
+            if ($pdf->GetY() + $rowH > $maxY) {
+                $pdf->AddPage();
+                $drawHeader();
+                $fill = false;
+            }
+
+            $pdf->SetFont('helvetica', '', 7.5);
+            $pdf->SetDrawColor(203, 213, 225);
+            $bgR = $fill ? 248 : 255;
+            $bgG = $fill ? 250 : 255;
+            $bgB = $fill ? 252 : 255;
+            $pdf->SetFillColor($bgR, $bgG, $bgB);
+
+            $drawRow($values, $aligns, $rowH);
+
+            $fill = !$fill;
+            $i++;
         }
 
-        // ── TOTAL ROW ──
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'B', 9);
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', 0, 0, 'C');
-        }
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', 0, 0, 'C');
-        }
-        $pdf->Cell(80, 10, 'TOTAL', 'TB', 0, 'R');
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(60, 10, '', 'TB', 0, 'C');
-        }
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->Cell(60, 10, '', 'TB', 0, 'C');
-        }
-        $pdf->Cell(42, 10, '', 'TB', 0, 'C');
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(21, 10, number_format($grand_purchase_val, 2), 'TBL', 0, 'C');
-            $pdf->Cell(21, 10, number_format($grand_sale_val, 2), 'TBLR', 0, 'C');
+        // Total row
+        $pdf->SetFont('helvetica', 'B', 8);
+        $pdf->SetFillColor(220, 252, 231);
+        $pdf->SetTextColor(22, 101, 52);
+        $pdf->SetDrawColor(134, 239, 172);
+
+        if ($stocktype === 'actualstock') {
+            $sumW = $cols[0]+$cols[1]+$cols[2]+$cols[3]+$cols[4]+$cols[5]+$cols[6]+$cols[7];
+            $pdf->Cell($sumW,    7, 'TOTAL',                                1, 0, 'R', true);
+            $pdf->Cell($cols[8], 7, number_format($grand_purchase_val, 2), 1, 0, 'R', true);
+            $pdf->Cell($cols[9], 7, number_format($grand_sale_val, 2),     1, 1, 'R', true);
+        } elseif ($stocktype === 'physicalstock') {
+            $sumW = array_sum($cols);
+            $pdf->Cell($sumW, 7, 'TOTAL', 1, 1, 'R', true);
+        } else { // all
+            $sumW = $cols[0]+$cols[1]+$cols[2]+$cols[3]+$cols[4]+$cols[5]+$cols[6]+$cols[7]+$cols[8]+$cols[9]+$cols[10];
+            $pdf->Cell($sumW,     7, 'TOTAL',                               1, 0, 'R', true);
+            $pdf->Cell($cols[11], 7, number_format($grand_purchase_val, 2), 1, 0, 'R', true);
+            $pdf->Cell($cols[12], 7, number_format($grand_sale_val, 2),     1, 1, 'R', true);
         }
 
-        $date = date('Y-m-d');
-        $filename =  $_SESSION['header'] . "_$date.pdf";
+        $date     = date('Y-m-d');
+        $filename = str_replace(' ', '_', $title) . "_$date.pdf";
         $pdf->Output($filename, 'I');
+        exit;
     }
 
 
 
     public function generate_livestockreport()
     {
-        $page = 1;
-        $pdf = new StockReport('L', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Your Name');
-        $pdf->SetTitle($_SESSION['header']);
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, columns, example');
-        $top_margin = 5;
-        $pdf->SetMargins(15, $top_margin, 10);
-        $pdf->SetAutoPageBreak(TRUE, 20);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 10);
-
-        $this->header($pdf, $page,  $_SESSION['header'], $_SESSION['sr_istype'], $_SESSION['srfrom_date'], $_SESSION['srto_date']);
-
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->Cell(15, 10, '', 'TL', 0, 'L', 0, '', 1);
-        $pdf->Cell(90, 10, 'Product Information', 'TL', 0, 'C', 0, '', 1);
-        $pdf->Cell(15, 10, '', 'T', 0, 'R', 0, '', 1);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(24, 10, 'Actual Stock', 'TL', 0, 'C', 0, '', 1);
-        }
-
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->Cell(24, 10, 'Physical Stock', 'TL', 0, 'C', 0, '', 1);
-        }
-
-
-        $pdf->Cell(15, 10, '', 'TL', 0, 'L', 0, '', 1);
-
-        $pdf->Cell(35, 10, 'Unit Price', 'TR', 0, 'L', 0, '', 1);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(15, 10, '', 'TL', 0, 'L', 0, '', 1);
-
-            $pdf->Cell(35, 10, 'Stock Value', 'TR', 0, 'L', 0, '', 1);
-        }
-
-
-
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'B', 8);
-
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-        }
-
-        $pdf->MultiCell(15, 10, 'Sl', 'TLB', 'C', 0, 0);
-        $pdf->MultiCell(40, 10, 'Category', 'TLB', 'L', 0, 0);
-        $pdf->MultiCell(50, 10, 'Product Name', 'TLB', 'L', 0, 0);
-        $pdf->MultiCell(15, 10, 'Unit', 'TLB', 'C', 0, 0);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->MultiCell(24, 10, "Avl.Qty", 'TLB', 'C', 0, 0);
-        }
-
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->MultiCell(24, 10, "Avl.Qty", 'TLB', 'C', 0, 0);
-        }
-
-        $pdf->MultiCell(25, 10, "Purchase Price", 'TLB', 'C', 0, 0);
-        $pdf->MultiCell(25, 10, "Sale Price", 'TLBR', 'C', 0, 0);
-
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->MultiCell(25, 10, "Act.Stock Purchase Val", 'TLB', 'C', 0, 0);
-            $pdf->MultiCell(25, 10, "Act.Stock Sale Val", 'TLBR', 'C', 0, 0);
-        }
-
-        $data =  $_SESSION['stock_report'];
-        $lineHeight = 10;
-        $maxY = 270;
-
-
-
-        $patotal = 0;
-        $total = 0;
-        $grand_purchase_val = 0;
-        $grand_sale_val = 0;
-        $pdf->SetFont('helvetica', '', 8);
-        $i = 1;
-
-        foreach ($data as $row) {
-            $pdf->Ln(10);
-
-            if ($_SESSION['sr_istype2'] == "actualstock") {
-                $pdf->Cell(20, 10, '', '', 0, 'C', 0, '', 1);
-            }
-
-            if ($_SESSION['sr_istype2'] == "physicalstock") {
-                $pdf->Cell(40, 10, '', '', 0, 'C', 0, '', 1);
-            }
-
-            $pdf->Cell(15, 10, $i, 'TLB', 0, 'C', 0, '', 1);
-            $pdf->Cell(40, 10, $row['category_name'], 'TLB', 0, 'L', 0, '', 1);
-            $pdf->Cell(50, 10, $row['product_name'], 'TLB', 0, 'L', 0, '', 1);
-            $pdf->Cell(15, 10, $row['unit'], 'TLB', 0, 'C', 0, '', 1);
-
-            if ($_SESSION['sr_istype2'] != "physicalstock") {
-                $pdf->Cell(24, 10, $row['avqty'], 'TLB', 0, 'C', 0, '', 1);
-            }
-
-            if ($_SESSION['sr_istype2'] != "actualstock") {
-                $pdf->Cell(24, 10, $row['pavqty'], 'TLB', 0, 'C', 0, '', 1);
-            }
-
-            $purchase_price = $row['stockunittype'] == "master" ? (is_numeric($row['purchase_price']) ? $row['purchase_price'] : 0) : (is_numeric($row['subpurchase_price']) ? $row['subpurchase_price'] : 0);
-            $sale_price     = $row['stockunittype'] == "master" ? (is_numeric($row['sale_price']) ? $row['sale_price'] : 0) : (is_numeric($row['subsale_price']) ? $row['subsale_price'] : 0);
-            $avqty_num      = is_numeric($row['avqtymain']) ? $row['avqtymain'] : 0;
-
-            $total_purchase = $purchase_price * $avqty_num;
-            $total_sale     = $sale_price * $avqty_num;
-
-            $grand_purchase_val += $total_purchase;
-            $grand_sale_val     += $total_sale;
-
-            $pdf->Cell(25, 10, number_format($purchase_price, 2), 'TLB', 0, 'C');
-            $pdf->Cell(25, 10, number_format($sale_price, 2), 'TLBR', 0, 'C');
-
-            if ($_SESSION['sr_istype2'] != "physicalstock") {
-                $pdf->Cell(25, 10, number_format($total_purchase, 2), 'TLB', 0, 'C');
-                $pdf->Cell(25, 10, number_format($total_sale, 2), 'TLBR', 0, 'C');
-            }
-            $i = $i + 1;
-        }
-
-        // ── TOTAL ROW ──
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'B', 9);
-        if ($_SESSION['sr_istype2'] == "actualstock") {
-            $pdf->Cell(20, 10, '', 0, 0, 'C');
-        }
-        if ($_SESSION['sr_istype2'] == "physicalstock") {
-            $pdf->Cell(40, 10, '', 0, 0, 'C');
-        }
-        $pdf->Cell(120, 10, 'TOTAL', 'TB', 0, 'R'); // Sl(15)+Product(50)+Category(40)+Unit(15) = 120
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(24, 10, '', 'TB', 0, 'C');
-        }
-        if ($_SESSION['sr_istype2'] != "actualstock") {
-            $pdf->Cell(24, 10, '', 'TB', 0, 'C');
-        }
-        $pdf->Cell(50, 10, '', 'TB', 0, 'C'); // Purchase Price + Sale Price = 25+25
-        if ($_SESSION['sr_istype2'] != "physicalstock") {
-            $pdf->Cell(25, 10, number_format($grand_purchase_val, 2), 'TBL', 0, 'C');
-            $pdf->Cell(25, 10, number_format($grand_sale_val, 2), 'TBLR', 0, 'C');
-        }
-
-        $date = date('Y-m-d');
-        $filename =  $_SESSION['header'] . "_$date.pdf";
-        $pdf->Output($filename, 'I');
+        $this->generate_stockreport();
     }
 
 
@@ -4214,90 +4052,97 @@ ORDER BY createddate DESC
 
     public function generate_product_batch_summary_report()
     {
-        $page = 1;
+        @ini_set('memory_limit', '512M');
+
+        $data = isset($_SESSION['product_batch_summary_report_data']) ? $_SESSION['product_batch_summary_report_data'] : [];
+
         $pdf = new StockReport('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Your Name');
         $pdf->SetTitle('Product Batch Summary Report');
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, columns, example');
-        $pdf->SetMargins(12, 5, 12);
-        $pdf->setHeaderMargin(0);
-        $pdf->setFooterMargin(10);
-        $pdf->SetAutoPageBreak(TRUE, 20);
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 15);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage('L', 'A4');
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetY(5);
 
-        $this->header($pdf, $page, 'Product Batch Summary Report', '', '', '');
+        $this->header($pdf, 1, 'Product Batch Summary Report', '', '', '');
 
         $this->renderProductBatchSummaryHeaderRow($pdf);
 
-        $data = isset($_SESSION['product_batch_summary_report_data']) ? $_SESSION['product_batch_summary_report_data'] : [];
         $lineHeight = 8;
-        $maxY = 185;
+        $maxY       = $pdf->GetPageHeight() - 18;
+        $fill       = false;
 
-        $pdf->SetFont('helvetica', '', 8.5);
+        $pdf->SetFont('helvetica', '', 7.5);
 
         foreach ($data as $row) {
             $supplier  = isset($row['supplier']) && trim((string)$row['supplier']) !== '' ? $row['supplier'] : 'n/a';
-            $batchText = (string) $row['batch_id'];
-            // getStringHeight gives the exact height MultiCell will render
+            $batchText = (string)$row['batch_id'];
             $rowHeight = max($lineHeight, $pdf->getStringHeight(28, $batchText));
 
             if ($pdf->GetY() + $rowHeight > $maxY) {
                 $pdf->AddPage('L', 'A4');
-                $page = $page + 1;
-                $pdf->SetY(5);
-                $this->header($pdf, $page, 'Product Batch Summary Report', '', '', '');
+                $this->header($pdf, 1, 'Product Batch Summary Report', '', '', '');
                 $this->renderProductBatchSummaryHeaderRow($pdf);
-                $pdf->SetFont('helvetica', '', 8.5);
+                $pdf->SetFont('helvetica', '', 7.5);
+                $fill = false;
             }
 
-            $rowY = $pdf->GetY();
+            $pdf->SetDrawColor(203, 213, 225);
+            if ($fill) { $pdf->SetFillColor(248, 250, 252); } else { $pdf->SetFillColor(255, 255, 255); }
 
-            $pdf->Cell(8,  $rowHeight, $row['sl'], 'LRB', 0, 'C');
-            $pdf->Cell(28, $rowHeight, $this->fitPdfText($pdf, $row['category'], 28), 'LRB', 0, 'L');
-            $pdf->Cell(46, $rowHeight, $this->fitPdfText($pdf, $row['product_name'], 46), 'LRB', 0, 'L');
-            $pdf->Cell(34, $rowHeight, $this->fitPdfText($pdf, $supplier, 34), 'LRB', 0, 'L');
+            $rowY   = $pdf->GetY();
+            $batchX = $pdf->GetX() + 8 + 28 + 46 + 34; // X position after first 4 cells
 
-            $batchX = $pdf->GetX();
-            $pdf->MultiCell(28, $lineHeight, $batchText, 'LRB', 'L', false, 0, $batchX, $rowY, true, 0, false, true, $rowHeight, 'T', false);
-            // Explicitly reset cursor to right of batch cell so remaining cells align correctly
+            $pdf->Cell(8,  $rowHeight, $row['sl'],                                       1, 0, 'C', true);
+            $pdf->Cell(28, $rowHeight, $this->fitPdfText($pdf, $row['category'], 28),    1, 0, 'L', true);
+            $pdf->Cell(46, $rowHeight, $this->fitPdfText($pdf, $row['product_name'], 46),1, 0, 'L', true);
+            $pdf->Cell(34, $rowHeight, $this->fitPdfText($pdf, $supplier, 34),           1, 0, 'L', true);
+
+            $pdf->MultiCell(28, $lineHeight, $batchText, 1, 'L', $fill, 0, $batchX, $rowY, true, 0, false, true, $rowHeight, 'T', false);
             $pdf->SetXY($batchX + 28, $rowY);
 
-            $pdf->Cell(22, $rowHeight, $row['manufacture_date'], 'LRB', 0, 'C');
-            $pdf->Cell(22, $rowHeight, $row['packing_date'], 'LRB', 0, 'C');
-            $pdf->Cell(22, $rowHeight, $row['expiry_date'], 'LRB', 0, 'C');
-            $pdf->Cell(18, $rowHeight, number_format((float)$row['mrp'], 2), 'LRB', 0, 'R');
-            $pdf->Cell(24, $rowHeight, $row['avqty'], 'LRB', 0, 'R');
-            $pdf->Cell(20, $rowHeight, $row['status'], 'LRB', 1, 'C');
+            $pdf->Cell(22, $rowHeight, $row['manufacture_date'],            1, 0, 'C', true);
+            $pdf->Cell(22, $rowHeight, $row['packing_date'],                1, 0, 'C', true);
+            $pdf->Cell(22, $rowHeight, $row['expiry_date'],                 1, 0, 'C', true);
+            $pdf->Cell(18, $rowHeight, number_format((float)$row['mrp'], 2),1, 0, 'R', true);
+            $pdf->Cell(24, $rowHeight, $row['avqty'],                       1, 0, 'R', true);
+            $pdf->Cell(20, $rowHeight, $row['status'],                      1, 1, 'C', true);
+
+            $fill = !$fill;
         }
 
         if (empty($data)) {
             $pdf->SetFont('helvetica', '', 10);
-            $pdf->Cell(272, 10, 'No data available for selected filters.', 'LRB', 1, 'C');
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->Cell(272, 10, 'No data available for selected filters.', 1, 1, 'C', true);
         }
 
-        $date = date('Y-m-d');
+        $date     = date('Y-m-d');
         $filename = "Product_Batch_Summary_Report_$date.pdf";
         $pdf->Output($filename, 'I');
+        exit;
     }
 
     private function renderProductBatchSummaryHeaderRow($pdf)
     {
-        $pdf->SetFont('helvetica', 'B', 8.5);
-        $pdf->Cell(8, 10, 'SL', 'LTRB', 0, 'C');
-        $pdf->Cell(28, 10, 'Category', 'LTRB', 0, 'C');
-        $pdf->Cell(46, 10, 'Product Name', 'LTRB', 0, 'C');
-        $pdf->Cell(34, 10, 'Supplier', 'LTRB', 0, 'C');
-        $pdf->Cell(28, 10, 'Batch ID', 'LTRB', 0, 'C');
-        $pdf->Cell(22, 10, 'MFG Date', 'LTRB', 0, 'C');
-        $pdf->Cell(22, 10, 'Packing Date', 'LTRB', 0, 'C');
-        $pdf->Cell(22, 10, 'Expiry Date', 'LTRB', 0, 'C');
-        $pdf->Cell(18, 10, 'MRP', 'LTRB', 0, 'C');
-        $pdf->Cell(24, 10, 'Master Stock Qty', 'LTRB', 0, 'C');
-        $pdf->Cell(20, 10, 'Status', 'LTRB', 1, 'C');
+        $pdf->SetFont('helvetica', 'B', 7.5);
+        $pdf->SetFillColor(51, 65, 85);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetDrawColor(148, 163, 184);
+        $pdf->SetLineWidth(0.2);
+        $pdf->Cell(8,  7, 'SL',               1, 0, 'C', true);
+        $pdf->Cell(28, 7, 'Category',         1, 0, 'C', true);
+        $pdf->Cell(46, 7, 'Product Name',     1, 0, 'C', true);
+        $pdf->Cell(34, 7, 'Supplier',         1, 0, 'C', true);
+        $pdf->Cell(28, 7, 'Batch ID',         1, 0, 'C', true);
+        $pdf->Cell(22, 7, 'MFG Date',         1, 0, 'C', true);
+        $pdf->Cell(22, 7, 'Packing Date',     1, 0, 'C', true);
+        $pdf->Cell(22, 7, 'Expiry Date',      1, 0, 'C', true);
+        $pdf->Cell(18, 7, 'MRP',              1, 0, 'C', true);
+        $pdf->Cell(24, 7, 'Master Stock Qty', 1, 0, 'C', true);
+        $pdf->Cell(20, 7, 'Status',           1, 1, 'C', true);
+        $pdf->SetTextColor(30, 41, 59);
     }
 
     public function bdtask_purchase_report_product_wise()

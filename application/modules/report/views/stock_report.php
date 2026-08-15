@@ -458,7 +458,11 @@
                         type: "post",
                         url: $('#baseUrl2').val() + 'report/report/set_stock_session',
                         data: {
-                            datas: JSON.stringify(datas),
+                            datas:     JSON.stringify(datas),
+                            stocktype: $('#stocktype').val() || 'all',
+                            title:     '<?php echo addslashes($title); ?>',
+                            from_date: $('#from_date').val(),
+                            to_date:   document.getElementById('single_date_checkbox').checked ? $('#from_date').val() : $('#to_date').val(),
                         },
                         error: function() {
                             $('#btn-filter').removeClass('btn-loading').prop('disabled', false);
