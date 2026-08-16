@@ -692,6 +692,7 @@ echo "</script>";
 <script>
     let count = 2
     let pendingBatchSelect = {};
+    let type2 = (usertype == 3) ? "B" : "A";
 
     let oldType = "";
     document.addEventListener("keydown", function(event) {
@@ -711,7 +712,6 @@ echo "</script>";
             );
         }
     });
-        let type2 = ""
 
     $(document).ready(function() {
         // document.getElementById('showBtn1').style.display = 'none';
@@ -725,11 +725,6 @@ echo "</script>";
             document.getElementById('style12').style.backgroundColor = '#E0E0E0';
             const title = document.getElementById('title');
             title.style.color = 'blue';
-            type2 = "B"
-
-        } else {
-            type2 = "A"
-
         }
         //  $('body').addClass("sidebar-mini sidebar-collapse");
 
@@ -1681,7 +1676,7 @@ echo "</script>";
             document.getElementById('codetype' + count).innerHTML = '';
         } else {
             $.ajax({
-                url: $('#baseUrl2').val() + 'invoice/invoice/getProductByName',
+                url: $('#baseUrl2').val() + 'invoice/invoice/getProductByNameStock',
                 type: 'POST',
                 data: { product_name: query },
                 success: function(response) {

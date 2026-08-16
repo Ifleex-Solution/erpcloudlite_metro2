@@ -4629,21 +4629,25 @@ class Accounts_model extends CI_Model
 
     public function delete_payment($id = null)
     {
-        $productExists = $this->db->from('purchase')
-            ->where('payment_type', $id)
-            ->count_all_results();
-        if ($productExists > 0) {
-            return false;
-        }
-        $productExists2 = $this->db->from('sale')
-            ->where('payment_type', $id)
-            ->count_all_results();
+        $tables = [
+            ['table' => 'purchase',        'col' => 'payment_type'],
+            ['table' => 'sale',            'col' => 'payment_type'],
+            ['table' => 'purchase_return', 'col' => 'payment_type'],
+            ['table' => 'sales_return',    'col' => 'payment_type'],
+            ['table' => 'service',         'col' => 'payment_type'],
+            ['table' => 'voucher',         'col' => 'from'],
+        ];
 
-        if ($productExists2 > 0) {
-            return false;
+        foreach ($tables as $t) {
+            $count = $this->db->from($t['table'])
+                ->where($t['col'], $id)
+                ->count_all_results();
+            if ($count > 0) {
+                return false;
+            }
         }
-        $this->db->where('id', $id)
-            ->delete("payment_type");
+
+        $this->db->where('id', $id)->delete('payment_type');
         return $this->db->affected_rows() > 0;
     }
 

@@ -143,6 +143,11 @@
                     </div>
                 </div>
 
+                <div class="form-group" id="password-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" style="width: 250px;" autocomplete="off">
+                </div>
+
                 <div class="report-btn-row">
                     <button type="button" id="btn-filter" class="btn btn-success" onclick="onFilterButtonClick()">
                         Generate Report
@@ -155,8 +160,16 @@
 
 <input type="hidden" name="baseUrl2" id="baseUrl2" class="baseUrl" value="<?php echo base_url(); ?>" />
 
+<?php
+echo "<script>";
+echo "let password_enable=" . json_encode($this->session->userdata('password_enable')) . ";";
+echo "let usertype=" . json_encode($this->session->userdata('user_level2')) . ";";
+echo "</script>";
+?>
 <script>
+    let type2 = '';
     $(document).ready(function() {
+        type2 = (usertype == 3) ? "B" : "A";
         getStoreDropdown();
         getSupplierDropdown();
     });
@@ -194,6 +207,29 @@
     }
 
     function onFilterButtonClick() {
+        if (password_enable == "1") {
+            if (document.getElementById('password').value == '') {
+                alert("Password shouldn't be empty");
+                return;
+            }
+            $.ajax({
+                url: $('#base_url').val() + 'dashboard/setting/checkpasswordReport',
+                type: 'POST',
+                data: { password: document.getElementById('password').value },
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    if (result == "wrong password") { alert("Wrong Password"); return; }
+                    if (type2 == "A" && result != "A") { alert("Wrong Password"); return; }
+                    generateReport();
+                },
+                error: function(e) { console.log(e); }
+            });
+        } else {
+            generateReport();
+        }
+    }
+
+    function generateReport() {
         $('#btn-filter').addClass('btn-loading').prop('disabled', true);
 
         $.ajax({

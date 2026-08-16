@@ -1097,7 +1097,7 @@ class Service_model extends CI_Model {
                 <i class="fa fa-fax" ></i>
             </button>';
 
-            $button .= '  <a style="margin-left:7px;" href="' . $base_url . 'service_details/' . $record->id . '" class="btn btn-success btn-xs" data-toggle="tooltip" data-placement="left" title="' . display('invoice') . '"><i class="fa fa-window-restore" aria-hidden="true"></i></a>';
+            $button .= '  <a style="margin-left:7px;" href="' . $base_url . 'service_details/' . $record->id . '" class="btn btn-success btn-xs" data-toggle="tooltip" data-placement="left" title="Sale of Service"><i class="fa fa-window-restore" aria-hidden="true"></i></a>';
 
 
             $link = '  <a style="margin-left:7px;" href="' . $base_url . 'service_details/' . $record->id . '"   >' . $record->service_id . '</a>';
@@ -1294,15 +1294,15 @@ class Service_model extends CI_Model {
             $link = $record->service_order_id;
 
             if($record->status==2){
-                $status='<span class="label label-danger"  >'.$record->status_label.'</a>';
+                $status='<span class="label label-danger">'.$record->status_label.'</span>';
             }
 
             if($record->status==1){
-                $status='<span class="label label-success"  >'.$record->status_label.'</a>';
+                $status='<span class="label label-success">'.$record->status_label.'</span>';
             }
 
             if($record->status==0){
-                $status='<span class="label label-warning"  >'.$record->status_label.'</a>';
+                $status='<span class="label label-primary">'.$record->status_label.'</span>';
             }
 
 

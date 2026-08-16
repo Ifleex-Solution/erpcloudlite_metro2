@@ -195,6 +195,11 @@
                 </div>
 
 
+                <div class="form-group" id="password-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" style="width: 250px;" autocomplete="off">
+                </div>
+
                 <div class="report-btn-row">
                     <button type="button" id="btn-filter" class="btn btn-success" onclick="onFilterButtonClick()">
                         Generate Report
@@ -208,8 +213,16 @@
 <input type="hidden" name="baseUrl2" id="baseUrl2" class="baseUrl" value="<?php echo base_url(); ?>" />
 
 <script src="<?php echo base_url('my-assets/js/admin_js/sales_report.js') ?>" type="text/javascript"></script>
+<?php
+echo "<script>";
+echo "let password_enable=" . json_encode($this->session->userdata('password_enable')) . ";";
+echo "let usertype=" . json_encode($this->session->userdata('user_level2')) . ";";
+echo "</script>";
+?>
 <script>
+    let type2 = '';
     $(document).ready(function() {
+        type2 = (usertype == 3) ? "B" : "A";
         getStoreDropdown(0);
     });
 
@@ -317,6 +330,7 @@
                 if (response2 != "not") {
                     let batches = JSON.parse(response2);
                     $.each(batches, function(index, batch) {
+                        if (batch.id == 1) return; // skip Default batch (already hardcoded above)
                         var label = batch.batchid + (batch.status == 0 ? ' (Inactive)' : '');
                         $batchDropdown.append('<option value="' + batch.id + '">' + label + '</option>');
                     });
@@ -356,19 +370,40 @@
     }
 
     function onFilterButtonClick() {
-        let type = "";
-
         if (!$('#stockunittype').val()) {
             alert('Please select Unit Type');
             return;
         }
-
         if (document.getElementById('batchtype').value == 1) {
             if (!document.getElementById('product').value) {
                 alert('Please select Product');
                 return;
             }
         }
+
+        if (password_enable == "1") {
+            if (document.getElementById('password').value == '') {
+                alert("Password shouldn't be empty");
+                return;
+            }
+            $.ajax({
+                url: $('#base_url').val() + 'dashboard/setting/checkpasswordReport',
+                type: 'POST',
+                data: { password: document.getElementById('password').value },
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    if (result == "wrong password") { alert("Wrong Password"); return; }
+                    if (type2 == "A" && result != "A") { alert("Wrong Password"); return; }
+                    generateReport();
+                },
+                error: function(e) { console.log(e); }
+            });
+        } else {
+            generateReport();
+        }
+    }
+
+    function generateReport() {
         $('#btn-filter').addClass('btn-loading').prop('disabled', true);
 
         $.ajax({

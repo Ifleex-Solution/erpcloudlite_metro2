@@ -162,7 +162,14 @@
 
                         </tr>
                     </table>
-                 
+
+                    <?php if (!empty($details)): ?>
+                    <div style="margin-top:16px; padding:10px; border-top:1px solid #e4e5e7;">
+                        <strong style="font-size:13px;">Details:</strong>
+                        <p style="margin:6px 0 0; font-size:12px; white-space:pre-wrap;"><?php echo nl2br(htmlspecialchars($details)); ?></p>
+                    </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>

@@ -1,0 +1,19 @@
+diff a/application/modules/stock/views/new_inventory_transection.php b/application/modules/stock/views/new_inventory_transection.php	(rejected hunks)
+@@ -719,17 +720,10 @@ echo "</script>";
+         $('#type').select2({placeholder: 'Select option', allowClear: true});
+         $('#type').on('select2:select select2:unselect', function() { change_type(); });
+ 
+-        let type2 = ""
+-
+         if (usertype == 3) {
+             document.getElementById('style12').style.backgroundColor = '#E0E0E0';
+             const title = document.getElementById('title');
+             title.style.color = 'blue';
+-            type2 = "B"
+-
+-        } else {
+-            type2 = "A"
+-
+         }
+         //  $('body').addClass("sidebar-mini sidebar-collapse");
+ 

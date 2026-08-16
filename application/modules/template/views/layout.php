@@ -228,6 +228,9 @@
                 if (data && data.app && data.app !== thisApp) return;
                 var base_url = $('#base_url').val();
                 window.location.href = base_url + 'logout';
+                // setTimeout(function() {
+                //     window.location.href = base_url + 'logout';
+                // }, 5000);
             });
         }
     })();

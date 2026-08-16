@@ -819,8 +819,8 @@ echo "</script>";
                     var $incidenttypeDropdown = $('#incidenttype');
                     $incidenttypeDropdown.empty();
                     $incidenttypeDropdown.append('<option value="" disabled selected>Select Incident Type</option>'); // Add default option
-                    $incidenttypeDropdown.append('<option value="1">Retail</option>');
-                    $incidenttypeDropdown.append('<option value="2">Whole Sale</option>');
+                    $incidenttypeDropdown.append('<option value="1">International Purchase</option>');
+                    $incidenttypeDropdown.append('<option value="2">Local Purchase</option>');
                     $incidenttypeDropdown.val(purchases[0].incidenttype)
 
                     var $invoiceTypeDropdown = $('#invoicetype');
@@ -934,8 +934,8 @@ echo "</script>";
                 var $incidenttypeDropdown = $('#incidenttype');
                 $incidenttypeDropdown.empty();
                 $incidenttypeDropdown.append('<option value="" disabled selected>Select Incident Type</option>'); // Add default option
-                $incidenttypeDropdown.append('<option value="1">Local Purchase</option>');
-                $incidenttypeDropdown.append('<option value="2">International Purchase</option>');
+                $incidenttypeDropdown.append('<option value="1">International Purchase</option>');
+                $incidenttypeDropdown.append('<option value="2">Local Purchase</option>');
                 $incidenttypeDropdown.val(purchases[0].incidenttype)
 
                 var $invoiceTypeDropdown = $('#invoicetype');

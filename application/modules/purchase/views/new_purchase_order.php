@@ -407,19 +407,19 @@
     .select2-container--default .select2-results__option[aria-selected=true] { background: #F0FDF4 !important; color: #16A34A !important; }
 
     /* ── Modals — brand page style ── */
-    #addProductModal .modal-content, #addSupplierModal .modal-content { border-radius: 12px !important; border: none !important; box-shadow: 0 8px 32px rgba(0,0,0,.15) !important; }
-    #addProductModal .modal-header, #addSupplierModal .modal-header { background: #fff !important; border-bottom: 2px solid #F1F5F9 !important; padding: 16px 24px !important; border-radius: 12px 12px 0 0 !important; }
-    #addProductModal .modal-header h4, #addSupplierModal .modal-header h4 { font-size: 15px !important; font-weight: 700 !important; color: #1E293B !important; margin: 0 !important; text-align: left !important; }
-    #addProductModal .modal-header .close, #addSupplierModal .modal-header .close { color: #94A3B8 !important; opacity: 1 !important; }
-    #addProductModal .modal-header .close:hover, #addSupplierModal .modal-header .close:hover { color: #475569 !important; }
-    #addProductModal .modal-body, #addSupplierModal .modal-body { padding: 20px 24px !important; background: #fff !important; }
-    #addProductModal .modal-body .form-group label, #addSupplierModal .modal-body .form-group label { font-size: 13px !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 5px !important; }
-    #addProductModal .modal-body .form-control, #addSupplierModal .modal-body .form-control { border: 1.5px solid #E2E8F0 !important; border-radius: 8px !important; font-size: 13px !important; color: #374151 !important; background: #F8FAFC !important; height: auto !important; padding: 8px 12px !important; }
-    #addProductModal .modal-body .form-control:focus, #addSupplierModal .modal-body .form-control:focus { border-color: #16A34A !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(22,163,74,.12) !important; outline: none !important; }
-    #addProductModal .modal-footer, #addSupplierModal .modal-footer { padding: 12px 24px !important; border-top: 2px solid #F1F5F9 !important; border-radius: 0 0 12px 12px !important; background: #fff !important; }
-    #addProductModal .modal-footer .btn-default, #addSupplierModal .modal-footer .btn-default { border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; padding: 8px 18px !important; }
-    #addProductModal .modal-footer .btn-primary, #addSupplierModal .modal-footer .btn-primary { background: #16A34A !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; padding: 8px 18px !important; color: #fff !important; transition: background .15s, box-shadow .15s !important; }
-    #addProductModal .modal-footer .btn-primary:hover, #addSupplierModal .modal-footer .btn-primary:hover { background: #15803D !important; box-shadow: 0 4px 12px rgba(22,163,74,.30) !important; }
+    #addProductModal .modal-content, #addSupplierModal .modal-content, #addBatchModal .modal-content { border-radius: 12px !important; border: none !important; box-shadow: 0 8px 32px rgba(0,0,0,.15) !important; }
+    #addProductModal .modal-header, #addSupplierModal .modal-header, #addBatchModal .modal-header { background: #fff !important; border-bottom: 2px solid #F1F5F9 !important; padding: 16px 24px !important; border-radius: 12px 12px 0 0 !important; }
+    #addProductModal .modal-header h4, #addSupplierModal .modal-header h4, #addBatchModal .modal-header h4 { font-size: 15px !important; font-weight: 700 !important; color: #1E293B !important; margin: 0 !important; text-align: left !important; }
+    #addProductModal .modal-header .close, #addSupplierModal .modal-header .close, #addBatchModal .modal-header .close { color: #94A3B8 !important; opacity: 1 !important; }
+    #addProductModal .modal-header .close:hover, #addSupplierModal .modal-header .close:hover, #addBatchModal .modal-header .close:hover { color: #475569 !important; }
+    #addProductModal .modal-body, #addSupplierModal .modal-body, #addBatchModal .modal-body { padding: 20px 24px !important; background: #fff !important; }
+    #addProductModal .modal-body .form-group label, #addSupplierModal .modal-body .form-group label, #addBatchModal .modal-body .form-group label { font-size: 13px !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 5px !important; }
+    #addProductModal .modal-body .form-control, #addSupplierModal .modal-body .form-control, #addBatchModal .modal-body .form-control { border: 1.5px solid #E2E8F0 !important; border-radius: 8px !important; font-size: 13px !important; color: #374151 !important; background: #F8FAFC !important; height: auto !important; padding: 8px 12px !important; }
+    #addProductModal .modal-body .form-control:focus, #addSupplierModal .modal-body .form-control:focus, #addBatchModal .modal-body .form-control:focus { border-color: #16A34A !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(22,163,74,.12) !important; outline: none !important; }
+    #addProductModal .modal-footer, #addSupplierModal .modal-footer, #addBatchModal .modal-footer { padding: 12px 24px !important; border-top: 2px solid #F1F5F9 !important; border-radius: 0 0 12px 12px !important; background: #fff !important; }
+    #addProductModal .modal-footer .btn-default, #addSupplierModal .modal-footer .btn-default, #addBatchModal .modal-footer .btn-default { border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; padding: 8px 18px !important; }
+    #addProductModal .modal-footer .btn-primary, #addSupplierModal .modal-footer .btn-primary, #addBatchModal .modal-footer .btn-success { background: #16A34A !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; padding: 8px 18px !important; color: #fff !important; transition: background .15s, box-shadow .15s !important; }
+    #addProductModal .modal-footer .btn-primary:hover, #addSupplierModal .modal-footer .btn-primary:hover, #addBatchModal .modal-footer .btn-success:hover { background: #15803D !important; box-shadow: 0 4px 12px rgba(22,163,74,.30) !important; }
     #addProductModal .select2-container .select2-selection--single, #addProductModal .select2-container--default .select2-selection--single { border: 1.5px solid #E2E8F0 !important; border-radius: 8px !important; background: #F8FAFC !important; height: 38px !important; }
     #addProductModal .select2-container .select2-selection--single .select2-selection__rendered { color: #374151 !important; font-size: 13px !important; line-height: 36px !important; padding-left: 10px !important; }
     #addProductModal .select2-container--default.select2-container--focus .select2-selection--single, #addProductModal .select2-container--default.select2-container--open .select2-selection--single { border-color: #16A34A !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(22,163,74,.12) !important; }
@@ -924,31 +924,140 @@ echo "</script>";
 
     }
     let count = 2
+    let batchModalRowNum = 0;
+    let pendingBatchSelect = {};
+    let mbResults = [];
+    let mbCurrentIndex = -1;
 
     document.addEventListener("keydown", function(event) {
-        // Check if the pressed key is F2
-        if (event.key === "F2") {
-            window.open(
-                $('#base_url').val() + "stockbatch_form",
-                "popupWindow",
-                "width=1000,height=800,scrollbars=yes"
-            );
-        }
-        if (event.key === "F3") {
-            window.open(
-                $('#base_url').val() + "stockbatchlist",
-                "popupWindow",
-                "width=1000,height=800,scrollbars=yes"
-            );
-        }
+        if (event.key === "F2") { openStockbatch(); }
+        if (event.key === "F3") { manageStockbatch(); }
     });
 
-    function openStockbatch() {
-        window.open(
-            $('#base_url').val() + "stockbatch_form",
-            "popupWindow",
-            "width=1000,height=800,scrollbars=yes"
-        );
+    function openStockbatch(rowNum) {
+        batchModalRowNum = rowNum || 0;
+        document.getElementById('mb_batchid').value = '';
+        document.getElementById('mb_details').value = '';
+        document.getElementById('mb_busage').value = '';
+        document.getElementById('mb_status').value = '1';
+        document.getElementById('mb_mdate').value = '';
+        document.getElementById('mb_pdate').value = '';
+        document.getElementById('mb_edate').value = '';
+        document.getElementById('mb_edate_toggle').value = 'no';
+        document.getElementById('mb_mrp').value = '';
+        document.getElementById('mb_productInput').value = '';
+        document.getElementById('mb_product').value = '';
+
+        var $busageDropdown = $('#mb_busage');
+        $busageDropdown.empty();
+        $busageDropdown.append('<option value="" disabled selected>Select Batch Usage Type</option>');
+        $busageDropdown.append('<option value="single">Single Usage</option>');
+        $busageDropdown.append('<option value="multiple">Multiple Usage</option>');
+
+        var $edateDropdown = $('#mb_edate_toggle');
+        $edateDropdown.empty();
+        $edateDropdown.append('<option value="no">Disable</option>');
+        $edateDropdown.append('<option value="yes">Enable</option>');
+        $edateDropdown.val('no');
+
+        document.getElementById('mb_productResults').innerHTML = '';
+        mbResults = [];
+        mbCurrentIndex = -1;
+        $('#mb_singleshow, #mb_singleshow1, #mb_singleshow2, #mb_singleshow3, #mb_singleshow4').hide();
+        document.getElementById('mb_edate_row').style.display = 'none';
+        $('#mb_save_btn').prop('disabled', false).text('Save Batch');
+        $('#addBatchModal').modal('show');
+    }
+
+    function modalChangeBatchtype() {
+        let busage = document.getElementById('mb_busage').value;
+        if (busage === 'single') {
+            $('#mb_singleshow, #mb_singleshow1, #mb_singleshow2, #mb_singleshow3, #mb_singleshow4').show();
+        } else {
+            $('#mb_singleshow, #mb_singleshow1, #mb_singleshow2, #mb_singleshow3, #mb_singleshow4').hide();
+            document.getElementById('mb_edate_row').style.display = 'none';
+        }
+    }
+
+    function modalToggleEdate() {
+        if (document.getElementById('mb_edate_toggle').value === 'yes') {
+            document.getElementById('mb_edate_row').style.display = 'block';
+        } else {
+            document.getElementById('mb_edate_row').style.display = 'none';
+            document.getElementById('mb_edate').value = '';
+        }
+    }
+
+    function handleMbProductKeyPress(event) {
+        const query = document.getElementById('mb_productInput').value;
+        if (event.key === 'ArrowDown') {
+            if (mbCurrentIndex < mbResults.length - 1) { mbCurrentIndex++; highlightMbProduct(mbCurrentIndex); }
+        } else if (event.key === 'ArrowUp') {
+            if (mbCurrentIndex > 0) { mbCurrentIndex--; highlightMbProduct(mbCurrentIndex); }
+        } else if (event.key === 'Enter') {
+            if (mbResults.length > 0 && mbCurrentIndex >= 0) {
+                document.getElementById('mb_productInput').value = mbResults[mbCurrentIndex].product_name;
+                document.getElementById('mb_product').value = mbResults[mbCurrentIndex].id;
+                document.getElementById('mb_productResults').innerHTML = '';
+            }
+        } else if (event.key === 'Backspace') {
+            document.getElementById('mb_product').value = '';
+            document.getElementById('mb_productResults').innerHTML = '';
+        } else {
+            if (!query) return;
+            $.ajax({
+                url: $('#base_url').val() + 'invoice/invoice/getProductByNameMB',
+                type: 'POST',
+                data: { product_name: query },
+                success: function(response) {
+                    let prods = JSON.parse(response);
+                    mbResults = prods.filter(function(p) {
+                        return p.product_name.toLowerCase().includes(query.toLowerCase());
+                    });
+                    mbCurrentIndex = -1;
+                    displayMbProductResults(mbResults);
+                },
+                error: function(error) { console.log(error); }
+            });
+        }
+    }
+
+    function displayMbProductResults(results) {
+        const searchResultsDiv = document.getElementById('mb_productResults');
+        searchResultsDiv.innerHTML = '';
+        if (results.length === 0) {
+            searchResultsDiv.innerHTML = '<div style="padding:8px;">No results found</div>';
+        } else {
+            results.forEach(function(item, index) {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('mbResultItem');
+                resultItem.textContent = item.product_name;
+                resultItem.style.padding = '8px';
+                resultItem.style.cursor = 'pointer';
+                resultItem.addEventListener('mouseover', function() { this.style.backgroundColor = "#007BFF"; this.style.color = "#ffff"; });
+                resultItem.addEventListener('mouseout',  function() { this.style.backgroundColor = "#ffff"; this.style.color = "#000"; });
+                resultItem.addEventListener('click', function() {
+                    document.getElementById('mb_productInput').value = item.product_name;
+                    document.getElementById('mb_product').value = item.id;
+                    searchResultsDiv.innerHTML = '';
+                });
+                searchResultsDiv.appendChild(resultItem);
+            });
+        }
+        mbCurrentIndex = 0;
+        highlightMbProduct(0);
+    }
+
+    function highlightMbProduct(index) {
+        const items = document.querySelectorAll('.mbResultItem');
+        items.forEach(function(item, idx) {
+            if (idx === index) {
+                item.classList.add('highlight');
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                item.classList.remove('highlight');
+            }
+        });
     }
 
     function manageStockbatch() {
@@ -958,6 +1067,104 @@ echo "</script>";
             "width=1000,height=800,scrollbars=yes"
         );
     }
+
+    async function saveModalBatch() {
+        let batchid = document.getElementById('mb_batchid').value.trim();
+        let busage  = document.getElementById('mb_busage').value;
+        let status  = document.getElementById('mb_status').value;
+        let product = document.getElementById('mb_product').value;
+
+        if (!batchid)  { alert('Batch ID is required'); return; }
+        if (!busage)   { alert('Batch Usage Type is required'); return; }
+        if (status === '') { alert('Status is required'); return; }
+        if (busage === 'single' && !product) { alert('Product is required for Single Usage'); return; }
+
+        try {
+            let checkRes = await $.ajax({
+                type: 'POST',
+                url: $('#base_url').val() + 'stock/stock/getStockBatchById',
+                data: { batchid: batchid }
+            });
+            if (JSON.parse(checkRes) !== 'success') { alert('Batch ID already exists'); return; }
+        } catch (e) { alert('Error checking Batch ID'); return; }
+
+        let edate_toggle = document.getElementById('mb_edate_toggle').value;
+        let postData = {
+            batchid:  batchid,
+            details:  document.getElementById('mb_details').value,
+            busage:   busage,
+            status:   status,
+            edate_toggle: edate_toggle,
+            product:  busage === 'single' ? product : '0',
+            mdate:    busage === 'single' ? document.getElementById('mb_mdate').value : '',
+            pdate:    busage === 'single' ? document.getElementById('mb_pdate').value : '',
+            edate:    (busage === 'single' && edate_toggle === 'yes') ? document.getElementById('mb_edate').value : '',
+            mrp:      busage === 'single' ? (document.getElementById('mb_mrp').value || '0') : '0'
+        };
+
+        $('#mb_save_btn').prop('disabled', true).text('Saving...');
+
+        $.ajax({
+            type: 'POST',
+            url: $('#base_url').val() + 'stock/stock/save_stockbatch_ajax',
+            data: postData,
+            success: function(res) {
+                let result = JSON.parse(res);
+                $('#mb_save_btn').prop('disabled', false).text('Save Batch');
+                if (result.success) {
+                    $('select[id^="batch"]').each(function() {
+                        let rowNum  = this.id.replace('batch', '');
+                        let rowProd = document.getElementById('product' + rowNum) ? document.getElementById('product' + rowNum).value : '';
+                        if (result.busage === 'multiple' || !rowProd || rowProd == result.product) {
+                            $(this).append('<option value="' + result.id + '">' + result.batchid + '</option>');
+                        }
+                    });
+                    if (result.busage === 'single' && result.product > 0) {
+                        let rowNum = count;
+                        document.getElementById('myRow' + count).style.display = 'table-row';
+                        getActiveStore(0, count);
+                        count = count + 1;
+                        $.ajax({
+                            url: $('#base_url').val() + 'stock/stock/getproduct',
+                            type: 'POST',
+                            data: { prodid: result.product },
+                            success: function(resp) {
+                                let prod = JSON.parse(resp);
+                                let productName = (prod && prod.length > 0) ? prod[0].product_name : 'Product #' + result.product;
+                                alert('Batch saved successfully!\nBatch ID: ' + result.batchid + '\nProduct: ' + productName);
+                                if (prod && prod.length > 0) {
+                                    document.getElementById('productInput' + rowNum).value = prod[0].product_name;
+                                    document.getElementById('product' + rowNum).value = result.product;
+                                }
+                                pendingBatchSelect[rowNum] = result.id;
+                                product_search(rowNum, 'product1');
+                            }
+                        });
+                    } else {
+                        alert('Batch saved successfully!\nBatch ID: ' + result.batchid + '\nProduct: N/A (Multiple Usage)');
+                    }
+                    $('#addBatchModal').modal('hide');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            },
+            error: function() {
+                $('#mb_save_btn').prop('disabled', false).text('Save Batch');
+                alert('Network error saving batch');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('#addBatchModal').on('shown.bs.modal', function() {
+            $('#addBatchModal .datepicker').datepicker({
+                dateFormat: 'yy-mm-dd',
+                beforeShow: function(input, inst) {
+                    setTimeout(function() { inst.dpDiv.css('z-index', 99999); }, 0);
+                }
+            });
+        });
+    });
 
     function handleProductKeyPress(event, count) {
 
@@ -1177,9 +1384,9 @@ echo "</script>";
         var $incidenttypeDropdown = $('#incidenttype');
         $incidenttypeDropdown.empty();
         $incidenttypeDropdown.append('<option value="" disabled selected>Select Incident Type</option>'); // Add default option
-        $incidenttypeDropdown.append('<option value="1">Local Purchase</option>');
-        $incidenttypeDropdown.append('<option value="2">International Purchase</option>');
-        $incidenttypeDropdown.val(1)
+        $incidenttypeDropdown.append('<option value="1">International Purchase</option>');
+        $incidenttypeDropdown.append('<option value="2">Local Purchase</option>');
+        $incidenttypeDropdown.val(2)
 
 
         for (let j = 2; j <= 20; j++) {
@@ -1224,8 +1431,8 @@ echo "</script>";
                     var $incidenttypeDropdown = $('#incidenttype');
                     $incidenttypeDropdown.empty();
                     $incidenttypeDropdown.append('<option value="" disabled selected>Select Incident Type</option>'); // Add default option
-                    $incidenttypeDropdown.append('<option value="1">Local Purchase</option>');
-                    $incidenttypeDropdown.append('<option value="2">International Purchase</option>');
+                    $incidenttypeDropdown.append('<option value="1">International Purchase</option>');
+                    $incidenttypeDropdown.append('<option value="2">Local Purchase</option>');
                     $incidenttypeDropdown.val(purchases[0].incidenttype)
 
                     document.getElementById('total_discount_ammount').value = purchases[0].total_discount_ammount;
@@ -2570,6 +2777,100 @@ $('#addProductModal').on('hidden.bs.modal', function() {
 </script>
 
 <!-- Add Supplier Modal -->
+<div class="modal fade" id="addBatchModal" tabindex="-1" role="dialog" aria-labelledby="addBatchModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addBatchModalLabel">Add New Batch</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Batch ID <i class="text-danger">*</i></label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="mb_batchid" placeholder="Batch ID" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Details</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="mb_details" placeholder="Details" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Batch Usage Type <i class="text-danger">*</i></label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="mb_busage" onchange="modalChangeBatchtype()">
+                            <option value="">Select One</option>
+                            <option value="single">Single Usage</option>
+                            <option value="multiple">Multiple Usage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_singleshow" style="display:none;">
+                    <label class="col-sm-3 col-form-label">Product <i class="text-danger">*</i></label>
+                    <div class="col-sm-9">
+                        <div style="position:relative;display:inline-block;width:100%;">
+                            <input class="form-control" type="text" id="mb_productInput" placeholder="Product..." onkeyup="handleMbProductKeyPress(event)" autocomplete="off" />
+                            <input type="text" id="mb_product" hidden />
+                            <div id="mb_productResults" style="position:absolute;z-index:99999!important;max-height:150px;overflow-y:auto;border:1px solid #ddd;background-color:#fff;border-radius:4px;box-shadow:0 4px 6px rgba(0,0,0,0.1);" autocomplete="off"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_singleshow1" style="display:none;">
+                    <label class="col-sm-3 col-form-label">Manufacturing Date</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="datepicker form-control" id="mb_mdate" placeholder="YYYY-MM-DD" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_singleshow2" style="display:none;">
+                    <label class="col-sm-3 col-form-label">Expiry Date</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="mb_edate_toggle" onchange="modalToggleEdate()">
+                            <option value="no" selected>Disable</option>
+                            <option value="yes">Enable</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_edate_row" style="display:none;">
+                    <label class="col-sm-3 col-form-label">Select Expiry Date</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="datepicker form-control" id="mb_edate" placeholder="YYYY-MM-DD" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_singleshow3" style="display:none;">
+                    <label class="col-sm-3 col-form-label">Packing Date</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="datepicker form-control" id="mb_pdate" placeholder="YYYY-MM-DD" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row" id="mb_singleshow4" style="display:none;">
+                    <label class="col-sm-3 col-form-label">MRP</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="mb_mrp" placeholder="0.00" min="0" step="0.01" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Status <i class="text-danger">*</i></label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="mb_status">
+                            <option value="">Select One</option>
+                            <option value="1" selected>Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="mb_save_btn" onclick="saveModalBatch()">Save Batch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
