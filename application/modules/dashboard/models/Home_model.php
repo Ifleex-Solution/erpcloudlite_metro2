@@ -536,7 +536,7 @@ class Home_model extends CI_Model
                 END AS status,
                 CASE
                     WHEN master_stock_qty <= reserve_stock_level                                                          THEN 'btn-danger'
-                    WHEN master_stock_qty <= GREATEST(reorder_stock_level, reserve_stock_level)                          THEN 'btn-warning'
+                    WHEN master_stock_qty <= GREATEST(reorder_stock_level, reserve_stock_level)                          THEN 'btn-reorder'
                     WHEN master_stock_qty <= GREATEST(min_stock_level, reorder_stock_level, reserve_stock_level)         THEN 'btn-near-order'
                     WHEN master_stock_qty <= GREATEST(max_stock_level, min_stock_level, reorder_stock_level, reserve_stock_level) THEN 'btn-success'
                     ELSE 'btn-info'

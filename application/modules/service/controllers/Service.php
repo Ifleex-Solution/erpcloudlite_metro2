@@ -47,6 +47,35 @@ class Service extends MX_Controller
     }
 
 
+    public function insert_service_quick()
+    {
+        $service_name = trim($this->input->post('service_name', TRUE));
+        $charge       = trim($this->input->post('charge', TRUE));
+        $service_vat  = trim($this->input->post('service_vat', TRUE));
+
+        if (empty($service_name)) {
+            echo json_encode(['status' => 'Error', 'message' => 'Service name is required']); return;
+        }
+        if ($charge === '') {
+            echo json_encode(['status' => 'Error', 'message' => 'Charge is required']); return;
+        }
+
+        $data = [
+            'service_name' => $service_name,
+            'charge'       => $charge,
+            'service_vat'  => $service_vat !== '' ? $service_vat : 0,
+            'status'       => 1,
+            'description'  => trim($this->input->post('description', TRUE)),
+        ];
+
+        $new_id = $this->service_model->service_entry($data);
+        if ($new_id === FALSE) {
+            echo json_encode(['status' => 'Error', 'message' => 'Service with this name already exists']);
+        } else {
+            echo json_encode(['status' => 'Success', 'id' => $new_id, 'service_name' => $service_name, 'charge' => $charge]);
+        }
+    }
+
     public function insert_service()
     {
         $tablecolumn = $this->db->list_fields('product_service');
@@ -1081,8 +1110,9 @@ class Service extends MX_Controller
             'payment' => $this->input->post('payment', TRUE)
         );
 
+        $data['terms_list'] = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
         $data['details'] = $this->load->view('service/pos_print',  $data, true);
-        // $printdata       = $this->invoice_model->bdtask_invoice_pos_print_direct($inv_insert_id, "god");      
+        // $printdata       = $this->invoice_model->bdtask_invoice_pos_print_direct($inv_insert_id, "god");
 
         echo json_encode($data);
     }
@@ -1312,6 +1342,7 @@ class Service extends MX_Controller
             'payment' => $this->input->post('payment', TRUE)
         );
 
+        $data['terms_list'] = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
         $data['details'] = $this->load->view('service/pos_print',  $data, true);
 
 
@@ -1415,11 +1446,12 @@ class Service extends MX_Controller
             'company_info'    => $company_info,
             'currency_details' => $currency_details,
             'date'    =>  $sale[0]['date'],
-            'details'    => "",
+            'details'    => $sale[0]['details'] ?? "",
             'invoiceno' => $sale[0]['service_id'],
             'payment' => ""
         );
 
+        $data['terms_list'] = $this->db->select('*')->from('seles_termscondi')->where('status', 1)->get()->result();
         $data['details'] = $this->load->view('service/pos_print',  $data, true);
 
 
@@ -1435,7 +1467,7 @@ class Service extends MX_Controller
          AES_DECRYPT(discount, '" . $encryption_key . "') AS discount,
           AES_DECRYPT(total_discount_ammount, '" . $encryption_key . "') AS total_discount_ammount,
          AES_DECRYPT(total_vat_amnt, '" . $encryption_key . "') AS total_vat_amnt,customer_id,
-            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date ")
+            AES_DECRYPT(grandTotal, '" . $encryption_key . "') AS grandTotal,date,details ")
             ->from('service')
             ->where('id', $id)
             ->get()

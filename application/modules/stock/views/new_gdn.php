@@ -1615,7 +1615,7 @@ echo "</script>";
             document.getElementById('codetype' + count).innerHTML = '';
         } else {
             $.ajax({
-                url: $('#baseUrl2').val() + 'invoice/invoice/getProductByName',
+                url: $('#baseUrl2').val() + 'invoice/invoice/getProductByNameStock',
                 type: 'POST',
                 data: { product_name: query },
                 success: function(response) {

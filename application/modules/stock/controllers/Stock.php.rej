@@ -1,0 +1,44 @@
+diff a/application/modules/stock/controllers/Stock.php b/application/modules/stock/controllers/Stock.php	(rejected hunks)
+@@ -2049,10 +2049,8 @@ WHERE id = '{$id}';
+         $base_url = base_url();
+         echo '<script type="text/javascript">
+         alert("Deleted successfully");
+-        window.location.href = "' . $base_url . 'manage_stock_adjustment";
++        window.location.href = "' . $base_url . 'manage_inventory_transection";
+        </script>';
+-
+-        // redirect("manage_stock_adjustment");
+     }
+ 
+     public function bdtask_manage_stock_adjustment()
+@@ -4494,7 +4492,7 @@ WHERE id = '{$id}';
+         $escaped_pid = $this->db->escape($product_id);
+ 
+         $stock_filter_single = "
+-            (
++            (stockbatch.id = 1 OR (
+                 (SELECT IFNULL(SUM(CAST(AES_DECRYPT(sd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+                    FROM stock_details sd
+                   WHERE sd.batch   = stockbatch.id
+@@ -4503,10 +4501,10 @@ WHERE id = '{$id}';
+                    FROM phystock_details pd
+                   WHERE pd.batch   = stockbatch.id
+                     AND pd.product = CAST(stockbatch.product AS CHAR))
+-            ) > 0";
++            ) > 0)";
+ 
+         $stock_filter_multi = "
+-            (
++            (stockbatch.id = 1 OR (
+                 (SELECT IFNULL(SUM(CAST(AES_DECRYPT(sd.stock, '{$encryption_key}') AS DECIMAL(18,4))), 0)
+                    FROM stock_details sd
+                   WHERE sd.batch   = stockbatch.id
+@@ -4515,7 +4513,7 @@ WHERE id = '{$id}';
+                    FROM phystock_details pd
+                   WHERE pd.batch   = stockbatch.id
+                     AND pd.product = {$escaped_pid})
+-            ) > 0";
++            ) > 0)";
+ 
+         if ($this->input->post('batchtype', TRUE) == 1) {
+             $this->db->select('id, AES_DECRYPT(batchid, "' . $encryption_key . '") as batchid');

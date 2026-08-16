@@ -186,6 +186,9 @@
                                     <button class="btn btn-success m-b-5 m-r-2" data-toggle="modal" data-target="#customerModel">
                                         <i class="fa fa-user-plus"></i> Add Customer
                                     </button>
+                                    <button type="button" class="btn btn-info m-b-5 m-r-2" onclick="openAddServiceModal()">
+                                        <i class="fa fa-plus"></i> Add Service
+                                    </button>
                                 </td>
                             </tr>
                         </table>
@@ -1256,3 +1259,92 @@ echo "</script>";
         </div>
     </div>
 </div>
+
+<!-- Add Service Modal -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="font-weight:600;">Add New Service</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label style="font-weight:600;">Service Name <span class="text-danger">*</span></label>
+                    <input type="text" id="as_service_name" class="form-control" placeholder="Enter service name">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600;">Charge <span class="text-danger">*</span></label>
+                    <input type="number" id="as_charge" class="form-control" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600;">VAT %</label>
+                    <input type="number" id="as_service_vat" class="form-control" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600;">Description</label>
+                    <textarea id="as_description" class="form-control" placeholder="Description" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="as_save_btn" onclick="saveNewService()">Save Service</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function openAddServiceModal() {
+    $('#as_service_name').val('');
+    $('#as_charge').val('');
+    $('#as_service_vat').val('');
+    $('#as_description').val('');
+    $('#as_save_btn').prop('disabled', false).text('Save Service');
+    $('#addServiceModal').modal('show');
+}
+function saveNewService() {
+    var name   = $('#as_service_name').val().trim();
+    var charge = $('#as_charge').val().trim();
+    if (!name)   { alert('Service name is required.'); return; }
+    if (charge === '') { alert('Charge is required.'); return; }
+    $('#as_save_btn').prop('disabled', true).text('Saving...');
+    $.ajax({
+        url: $('#base_url').val() + 'service/service/insert_service_quick',
+        type: 'POST',
+        data: {
+            service_name: name,
+            charge:       charge,
+            service_vat:  $('#as_service_vat').val().trim(),
+            description:  $('#as_description').val().trim()
+        },
+        dataType: 'json',
+        success: function(r) {
+            $('#as_save_btn').prop('disabled', false).text('Save Service');
+            if (r.status === 'Success') {
+                // Add the new service to all product dropdowns
+                var newOption = $('<option>').val(r.id).text(r.service_name);
+                $('select[name="product[]"]').append(newOption.clone());
+                // Select it in the first visible empty row
+                var placed = false;
+                for (var i = 1; i <= 20; i++) {
+                    var row = document.getElementById('myRow' + i);
+                    var sel = document.getElementById('product' + i);
+                    if (sel && row && row.style.display !== 'none' && sel.value === '') {
+                        sel.value = r.id;
+                        product_search(i, 'product');
+                        placed = true;
+                        break;
+                    }
+                }
+                $('#addServiceModal').modal('hide');
+            } else {
+                alert(r.message || 'Failed to save service.');
+            }
+        },
+        error: function() {
+            $('#as_save_btn').prop('disabled', false).text('Save Service');
+            alert('Failed to save service. Please try again.');
+        }
+    });
+}
+</script>

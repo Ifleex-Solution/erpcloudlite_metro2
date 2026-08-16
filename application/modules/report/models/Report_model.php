@@ -1668,8 +1668,10 @@ ORDER BY quantity DESC
                 AES_DECRYPT(s.tax_invoice_id,  '$encryption_key')                              AS sale_id,
                 s.date                                                                         AS sale_date,
                 ROUND(AES_DECRYPT(s.grandTotal, '$encryption_key'), 2)                        AS grand_total,
+                ROUND(IFNULL(AES_DECRYPT(s.total_vat_amnt, '$encryption_key'), 0), 2)         AS vat_val,
+                ROUND(AES_DECRYPT(s.grandTotal, '$encryption_key') - IFNULL(AES_DECRYPT(s.total_vat_amnt, '$encryption_key'), 0), 2) AS invoice_total,
                 ROUND(sc.cost, 2)                                                              AS cost,
-                ROUND(AES_DECRYPT(s.grandTotal, '$encryption_key') - sc.cost, 2)              AS profit
+                ROUND(AES_DECRYPT(s.grandTotal, '$encryption_key') - IFNULL(AES_DECRYPT(s.total_vat_amnt, '$encryption_key'), 0) - sc.cost, 2) AS profit
             FROM sale s
             LEFT JOIN sale_cost  sc ON sc.pid  = s.id
             LEFT JOIN employee_history e ON e.id = s.employee_id

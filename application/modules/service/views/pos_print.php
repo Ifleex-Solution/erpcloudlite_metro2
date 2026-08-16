@@ -164,7 +164,23 @@
 
                         </tr>
                     </table>
-                 
+
+                    <?php if (!empty($details)): ?>
+                    <div style="margin-top:16px; padding:10px; border-top:1px solid #e4e5e7;">
+                        <strong style="font-size:13px;">Details:</strong>
+                        <p style="margin:6px 0 0; font-size:12px; white-space:pre-wrap;"><?php echo nl2br(htmlspecialchars($details)); ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($terms_list)): ?>
+                    <div style="margin-top:12px; padding:10px; border-top:1px solid #e4e5e7;">
+                        <strong style="font-size:13px;">Terms &amp; Conditions:</strong>
+                        <?php foreach ($terms_list as $term): ?>
+                        <p style="margin:4px 0 0; font-size:12px;"><?php echo htmlspecialchars($term->name ?? $term->terms ?? ''); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>

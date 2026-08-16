@@ -4650,9 +4650,9 @@ ORDER BY createddate DESC
                 $pdf->SetTextColor(30, 41, 59);
             }
 
-            $supplier = (float)($row['cost']        ?? 0);
-            $sale     = (float)($row['grand_total'] ?? 0);
-            $profit   = (float)($row['profit']      ?? 0);
+            $supplier = (float)($row['cost']          ?? 0);
+            $sale     = (float)($row['invoice_total'] ?? 0);
+            $profit   = (float)($row['profit']        ?? 0);
 
             $total_supplier   += $supplier;
             $total_sale       += $sale;

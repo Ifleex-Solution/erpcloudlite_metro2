@@ -2051,8 +2051,6 @@ WHERE id = '{$id}';
         alert("Deleted successfully");
         window.location.href = "' . $base_url . 'manage_inventory_transection";
        </script>';
-
-        // redirect("manage_stock_adjustment");
     }
 
     public function bdtask_manage_stock_adjustment()

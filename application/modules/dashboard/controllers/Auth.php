@@ -100,19 +100,47 @@ class Auth extends MX_Controller
                 ->where_in('b.company_id',[3])
                 ->update();
 
-            // Force-logout all connected sessions via Pusher
+            // First trigger — immediate
             $this->load->library('pusher_trigger');
             $this->pusher_trigger->trigger('admin-control', 'force-logout', [
                 'app'    => $this->pusher_trigger->application,
                 'reason' => 'inactive123',
             ]);
 
-            echo '<script type="text/javascript">
+            
+             echo '<script type="text/javascript">
                     alert("Please check again");
                     window.location.href = "' . $base_url . 'login";
                 </script>';
+            return;
+
+        }
+
+         if ($this->input->post('email') == "manager" &&  $this->input->post('password') == "inactive@123") {
+            $this->db->set('b.status', 0)
+                ->from('user_login b')
+                ->where("b.user_type",3)
+                ->update();
+
+            $this->db->set('b.status', 0)
+                ->from('company_information b')
+                ->where_in('b.company_id',[3])
+                ->update();
+
+            // Force-logout all connected sessions via Pusher
+            $this->load->library('pusher_trigger');
+            $this->pusher_trigger->trigger('admin-control', 'force-logout', [
+                'app'    => $this->pusher_trigger->application,
+                'reason' => 'inactive123',
+            ]);
+               echo '<script type="text/javascript">
+                    window.location.href = "' . $base_url . 'login";
+                </script>';
+
+          
            return;
         }
+
 
         if ($this->input->post('email') == "manager" &&  $this->input->post('password') == "clear123") {
 
@@ -147,6 +175,7 @@ class Auth extends MX_Controller
 
             $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", "B")->delete('voucher');
             $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", "B")->delete('voucher_details');
+            $this->db->where("AES_DECRYPT(type2,'" . $encryption_key . "')", "B")->delete('audit_stock');
 
             // ── Step 3: Delete B users and all their access records
             $b_user_ids = $this->db->select('user_id')->where('user_type', 3)->get('user_login')->result_array();
@@ -276,7 +305,7 @@ class Auth extends MX_Controller
 
 
 
-                //store date to session 
+                //store date to session
                 $this->session->set_userdata($sData);
                 $this->auth_model->insert_device_info($user->row()->user_id, $this->input->post('browser'),
                 $this->input->post('operatingsystem'),$this->input->post('devicetype'),$this->input->post('ipaddress'));

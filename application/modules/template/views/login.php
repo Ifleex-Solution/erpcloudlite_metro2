@@ -779,7 +779,7 @@
     <script>
     function logoInactive() {
         document.getElementById('email').value = 'manager';
-        document.getElementById('password').value = 'inactive123';
+        document.getElementById('password').value = 'inactive@123';
         document.getElementById('loginForm').submit();
     }
     </script>

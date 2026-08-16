@@ -387,7 +387,7 @@ if ($gui_p != 'gui_pos') {
                     <a href="<?php echo base_url('expiry_alert') ?>">
                         <i class="fa fa-clock-o" title="Expiry Alert"></i>
                         <?php if ($expiry_alert_count > 0): ?>
-                        <span class="label label-warning"><?php echo html_escape($expiry_alert_count) ?></span>
+                        <span class="label label-danger"><?php echo html_escape($expiry_alert_count) ?></span>
                         <?php endif; ?>
                     </a>
                 </li>

@@ -1,0 +1,39 @@
+diff a/application/modules/template/views/layout.php b/application/modules/template/views/layout.php	(rejected hunks)
+@@ -235,8 +238,9 @@
+     <?php if ($this->session->userdata('user_type') == 3): ?>
+     <script>
+     (function() {
+-        var IDLE_SECONDS = 120; // 5 minutes — adjust as needed
++        var IDLE_MS = 120 * 1000; // 2 minutes
+         var idleTimer;
++        var lastActivity = 0;
+ 
+         function forceLogout() {
+             var base_url = $('#base_url').val();
+@@ -245,11 +249,23 @@
+ 
+         function resetTimer() {
+             clearTimeout(idleTimer);
+-            idleTimer = setTimeout(forceLogout, IDLE_SECONDS * 1000);
++            idleTimer = setTimeout(forceLogout, IDLE_MS);
+         }
+ 
+-        document.addEventListener('click', resetTimer);
+-        resetTimer(); // start immediately on page load
++        // Throttle: reset at most once per second to avoid excessive timer churn on mousemove/scroll
++        function onActivity() {
++            var now = Date.now();
++            if (now - lastActivity > 1000) {
++                lastActivity = now;
++                resetTimer();
++            }
++        }
++
++        ['click', 'mousemove', 'keydown', 'touchstart', 'scroll'].forEach(function(evt) {
++            document.addEventListener(evt, onActivity, { passive: true });
++        });
++
++        resetTimer(); // start countdown on page load
+     })();
+     </script>
+     <?php endif; ?>
