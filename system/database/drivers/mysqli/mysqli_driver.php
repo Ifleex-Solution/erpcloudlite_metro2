@@ -583,18 +583,18 @@ class CI_DB_mysqli_driver extends CI_DB {
 	{
 		if (file_exists($this->outgoingPath.$this->fileName)) {
 
-			chmod($this->outgoingPath.$this->fileName, 0777);
-			
-			if (file_put_contents($this->outgoingPath.$this->fileName, $data  . PHP_EOL, FILE_APPEND) !== false) { 
+			@chmod($this->outgoingPath.$this->fileName, 0777);
+
+			if (file_put_contents($this->outgoingPath.$this->fileName, $data  . PHP_EOL, FILE_APPEND) !== false) {
 				return true;
 			} else {
-				return false; 
+				return false;
 			}
 
 		} else {
 
 			if (file_put_contents($this->outgoingPath.$this->fileName, $data  . PHP_EOL) !== false) {
-				chmod($this->outgoingPath.$this->fileName, 0777); 
+				@chmod($this->outgoingPath.$this->fileName, 0777);
 				return true;
 			} else {
 				return false; 
