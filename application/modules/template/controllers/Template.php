@@ -30,7 +30,7 @@ class Template extends MX_Controller {
         // $data['company_info']  = $company_data;
         // $data['company_name']  = $company_data[0]['company_name'];
         $data['discount_type'] = $settingdata->discount_type;
-        $data['max_version']   = file_get_contents(UPDATE_INFO_URL);
+        $data['max_version']   = @file_get_contents(UPDATE_INFO_URL);
         $data['current_version'] = $this->current_version();
         $data['bank_list']     = $this->template_model->bdtask_bank_list();
         $data['currency']      = $settingdata->currency;

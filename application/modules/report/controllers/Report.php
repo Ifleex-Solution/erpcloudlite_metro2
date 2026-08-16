@@ -3654,103 +3654,106 @@ ORDER BY createddate DESC
   
     public function generate_gross_profit_report()
     {
-        $page = 1;
+        @ini_set('memory_limit', '512M');
+
+        $data      = isset($_SESSION['gross_profit_report_data']) ? $_SESSION['gross_profit_report_data'] : [];
+        $from_date = isset($_SESSION['gprfrom_date']) ? $_SESSION['gprfrom_date'] : '';
+        $to_date   = isset($_SESSION['gprto_date'])   ? $_SESSION['gprto_date']   : '';
+        $istype    = isset($_SESSION['gpr_istype'])   ? $_SESSION['gpr_istype']   : '';
+
         $pdf = new StockReport('P', 'mm', 'A4', true, 'UTF-8', false);
-
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Your Name');
         $pdf->SetTitle('Gross Profit Report');
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, columns, example');
-        $top_margin = 5;
-        $pdf->SetMargins(15, $top_margin, 10);
-        $pdf->SetAutoPageBreak(TRUE, 20);
+        $pdf->SetMargins(15, 10, 15);
+        $pdf->SetAutoPageBreak(true, 20);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 10);
-        $this->header($pdf, $page, "Gross Profit Report", $_SESSION['gpr_istype'], $_SESSION['gprfrom_date'], $_SESSION['gprto_date']);
 
+        $this->header($pdf, 1, 'Gross Profit Report', $istype, $from_date, $to_date);
 
+        // Column widths (A4 portrait 210 - 15 - 15 = 180mm)
+        $cW = 100; // detail label
+        $cS = 40;  // sub-amount
+        $cT = 40;  // total amount
+        $lh = 8;
 
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(100, 10, "Detail", 'LRTB', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, 'Amount', 'LRTB', 0, 'R', 0, '', 1);
-        $pdf->Cell(40, 10, 'Amount', 'LRTB', 0, 'R', 0, '', 1);
-        $pdf->Ln(10);
+        // ── Table column header ──
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFillColor(51, 65, 85);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetDrawColor(148, 163, 184);
+        $pdf->SetLineWidth(0.2);
+        $pdf->Cell($cW, $lh, 'Detail',  1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, 'Amount',  1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, 'Amount',  1, 1, 'R', true);
+        $pdf->SetTextColor(30, 41, 59);
 
-        $data = isset($_SESSION['gross_profit_report_data']) ? $_SESSION['gross_profit_report_data'] : [];
-        $sale = array_filter($data, function($row) {
-            return $row['type'] === 'sale';
-        });
-        
-       $sop= $data[0]['grandtotal']- $data[1]['grandtotal'];
-        
-       $pdf->SetFont('helvetica', '', 12);
-        $pdf->Cell(100, 10, "Sale of Product", 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,number_format($sop, 2) , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->Ln(10);
+        $sop     = $data[0]['grandtotal'] - $data[1]['grandtotal'];
+        $revenue = $sop + $data[2]['grandtotal'];
+        $pop     = $data[3]['grandtotal'] - $data[4]['grandtotal'];
+        $cos     = $data[5]['grandtotal'] + $pop - $data[6]['grandtotal'];
+        $final   = $revenue - $cos;
 
+        // ── Revenue rows ──
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetDrawColor(203, 213, 225);
+        $pdf->SetFillColor(248, 250, 252);
+        $pdf->Cell($cW, $lh, 'Sale of Product', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, '', 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, number_format($sop, 2), 1, 1, 'R', true);
 
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->Cell($cW, $lh, 'Sale of Service', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, '', 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, number_format($data[2]['grandtotal'], 2), 1, 1, 'R', true);
 
-        $pdf->Cell(100, 10, "Sale of Service", 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'R', 0, '', 1);
-        $pdf->Cell(40, 10,number_format($data[2]['grandtotal'], 2) , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->Ln(10);
+        // Total Revenue (light slate highlight)
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFillColor(241, 245, 249);
+        $pdf->SetDrawColor(148, 163, 184);
+        $pdf->Cell($cW, $lh, 'Total Revenue', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, '', 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, number_format($revenue, 2), 1, 1, 'R', true);
 
+        // ── Cost of Sale section header ──
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFillColor(51, 65, 85);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetDrawColor(148, 163, 184);
+        $pdf->Cell($cW + $cS + $cT, $lh, 'Cost Of Sale', 1, 1, 'L', true);
+        $pdf->SetTextColor(30, 41, 59);
 
-       $revenue= $sop+$data[2]['grandtotal'];
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetDrawColor(203, 213, 225);
+        $pdf->SetFillColor(248, 250, 252);
+        $pdf->Cell($cW, $lh, '  Opening Stock', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, number_format($data[5]['grandtotal'], 2), 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, '', 1, 1, 'R', true);
 
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(100, 10, "Total Revenue", 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,number_format($revenue, 2) , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->Ln(10);
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->Cell($cW, $lh, '  Purchase of Product', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, number_format($pop, 2), 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, '', 1, 1, 'R', true);
 
+        $pdf->SetFillColor(248, 250, 252);
+        $pdf->Cell($cW, $lh, '  (-) Closing Stock', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, '(' . number_format($data[6]['grandtotal'], 2) . ')', 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, '(' . number_format($cos, 2) . ')', 1, 1, 'R', true);
 
+        // ── Gross Profit row (green) ──
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->SetFillColor(220, 252, 231);
+        $pdf->SetTextColor(22, 101, 52);
+        $pdf->SetDrawColor(134, 239, 172);
+        $pdf->Cell($cW, $lh, 'Gross Profit', 1, 0, 'L', true);
+        $pdf->Cell($cS, $lh, '', 1, 0, 'R', true);
+        $pdf->Cell($cT, $lh, number_format($final, 2), 1, 1, 'R', true);
 
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(100, 10, "Cost Of Sale", 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,'' , 'LR', 0, 'R', 0,'' , 1);
-
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->Cell(10, 10, '', 'L', 0, 'L', 0, '', 1);
-        $pdf->Cell(90, 10, 'Opening Stock', 'R', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,number_format($data[5]['grandtotal'], 2) , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'L', 0, '', 1);
-
-        
-        $pdf->Ln(10);
-        $pop= $data[3]['grandtotal']- $data[4]['grandtotal'];
-
-        $cos=$data[5]['grandtotal']+$pop-$data[6]['grandtotal'];
-
-        $pdf->Cell(10, 10, '', 'L', 0, 'L', 0, '', 1);
-        $pdf->Cell(90, 10, 'Purchase of Product', 'R', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,number_format($pop, 2) , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->Cell(40, 10, '', 'LR', 0, 'L', 0, '', 1);
-
-        $pdf->Ln(10);
-        $pdf->Cell(10, 10, '', 'L', 0, 'L', 0, '', 1);
-        $pdf->Cell(90, 10, '(-) Closing Stock', 'R', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10,"(".number_format($data[6]['grandtotal'], 2).")"  , 'LR', 0, 'R', 0,'' , 1);
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(40, 10,"(" .number_format($cos, 2).")", 'LR', 0, 'R', 0, '', 1);
-
-        $final=$revenue-$cos;
-        $pdf->Ln(10);
-        $pdf->Cell(100, 10, 'Gross Profit', 'LRBT', 0, 'L', 0, '', 1);
-        $pdf->Cell(40, 10, "" , 'LRTB', 0, 'R', 0,'' , 1);
-        $pdf->Cell(40, 10,number_format($final, 2), 'LRTB', 0, 'R', 0, '', 1);
-
-
-
-     
-
-        $date = date('Y-m-d'); 
-        $filename = "gross_profit Report_$date.pdf";
+        $date     = date('Y-m-d');
+        $filename = "Gross_Profit_Report_$date.pdf";
         $pdf->Output($filename, 'I');
+        exit;
     }
     public function gross_profit_categorywise_report()
     {
@@ -3792,94 +3795,116 @@ ORDER BY createddate DESC
 
     public function generate_grossprofitreportcategorywise()
     {
-        $page = 1;
+        @ini_set('memory_limit', '512M');
+
+        $data      = $_SESSION['gross_profit_report_category_data'] ?? [];
+        $from_date = isset($_SESSION['gprcfrom_date']) ? $_SESSION['gprcfrom_date'] : '';
+        $to_date   = isset($_SESSION['gprcto_date'])   ? $_SESSION['gprcto_date']   : '';
+        $istype    = isset($_SESSION['gprc_istype'])   ? $_SESSION['gprc_istype']   : '';
+
         $pdf = new StockReport('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Your Name');
-        $pdf->SetTitle('Gross Profit Report(Categorywise)');
-        $pdf->SetSubject('TCPDF Tutorial');
-        $pdf->SetKeywords('TCPDF, PDF, columns, example');
-    
-        $top_margin = 5;
-        $pdf->SetMargins(15, $top_margin, 10);
-        $pdf->SetAutoPageBreak(TRUE, 20);
+        $pdf->SetTitle('Gross Profit Report (Category Wise)');
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 15);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 10);
-    
-        $this->header($pdf, $page, "Gross Profit Report(Categorywise)", $_SESSION['gprc_istype'], $_SESSION['gprcfrom_date'], $_SESSION['gprcto_date']);
-    
-        $pdf->SetFont('helvetica', 'B', 12);
-        // First row
-        $pdf->Cell(40, 10, 'Category', 'TLR', 0, 'L', 0);
-        $pdf->Cell(40, 10, 'Products', 'TLR', 0, 'L', 0);
-        $pdf->Cell(33, 10, 'Total Sales', 'TLR', 0, 'C', 0);
-        $pdf->Cell(132, 10, 'Cost Of Sales', 'TLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, 'Gross Profit', 'TLR', 0, 'C', 0);
-        $pdf->Ln(10);
-    
-        // Second row (sub-columns under Cost Of Sales)
-        $pdf->Cell(40, 10, '', 'BLR', 0, 'L', 0);
-        $pdf->Cell(40, 10, '', 'BLR', 0, 'L', 0);
-        $pdf->Cell(33, 10, '', 'BLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, 'Opening Stock', 'TBLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, 'Total Purchase', 'TBLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, 'Closing Stock', 'TBLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, 'COGS', 'TBLR', 0, 'C', 0);
-        $pdf->Cell(33, 10, '', 'BLR', 0, 'C', 0);
-        $pdf->Ln(10);
-    
-        $data = $_SESSION['gross_profit_report_category_data'] ?? [];
-    
-        // Initialize totals
-        $total_sales = 0;
-        $total_opening = 0;
-        $total_purchase = 0;
-        $total_closing = 0;
-        $total_cogs = 0;
+
+        $this->header($pdf, 1, 'Gross Profit Report (Category Wise)', $istype, $from_date, $to_date);
+
+        // Column widths — A4 landscape 297 - 10 - 10 = 277mm
+        // 40 + 42 + 33 + 33 + 33 + 33 + 33 + 30 = 277
+        $c = [40, 42, 33, 33, 33, 33, 33, 30];
+        $lh = 7;
+
+        $drawHeader = function() use ($pdf, $c, $lh) {
+            $pdf->SetFont('helvetica', 'B', 7.5);
+            $pdf->SetFillColor(51, 65, 85);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetDrawColor(148, 163, 184);
+            $pdf->SetLineWidth(0.2);
+            // Row 1: merged "Cost Of Sales" span
+            $pdf->Cell($c[0], $lh, 'Category',     1, 0, 'C', true);
+            $pdf->Cell($c[1], $lh, 'Products',     1, 0, 'C', true);
+            $pdf->Cell($c[2], $lh, 'Total Sales',  1, 0, 'C', true);
+            $pdf->Cell($c[3]+$c[4]+$c[5]+$c[6], $lh, 'Cost Of Sales', 1, 0, 'C', true);
+            $pdf->Cell($c[7], $lh, 'Gross Profit', 1, 1, 'C', true);
+            // Row 2: sub-columns
+            $pdf->Cell($c[0], $lh, '',               1, 0, 'C', true);
+            $pdf->Cell($c[1], $lh, '',               1, 0, 'C', true);
+            $pdf->Cell($c[2], $lh, '',               1, 0, 'C', true);
+            $pdf->Cell($c[3], $lh, 'Opening Stock',  1, 0, 'C', true);
+            $pdf->Cell($c[4], $lh, 'Total Purchase', 1, 0, 'C', true);
+            $pdf->Cell($c[5], $lh, 'Closing Stock',  1, 0, 'C', true);
+            $pdf->Cell($c[6], $lh, 'COGS',           1, 0, 'C', true);
+            $pdf->Cell($c[7], $lh, '',               1, 1, 'C', true);
+            $pdf->SetTextColor(30, 41, 59);
+        };
+
+        $drawHeader();
+
+        $data      = $_SESSION['gross_profit_report_category_data'] ?? [];
+        $fill      = false;
+        $maxY      = $pdf->GetPageHeight() - 18;
+        $category  = '';
+
+        $total_sales        = 0;
+        $total_opening      = 0;
+        $total_purchase     = 0;
+        $total_closing      = 0;
+        $total_cogs         = 0;
         $total_gross_profit = 0;
-        $category="";
-    
+
         foreach ($data as $row) {
-    
-            $pdf->SetFont('', '', 10);
-            if($category==$row['category_name']){
-                $pdf->Cell(40, 10,"", 'LR', 0, 'L', 0);
-            }else{
-                $pdf->Cell(40, 10, $row['category_name'], 'LR', 0, 'L', 0);
-                $category= $row['category_name'];
+            if ($pdf->GetY() + $lh > $maxY) {
+                $pdf->AddPage();
+                $drawHeader();
+                $fill = false;
             }
-            $pdf->Cell(40, 10, $row['product_name'], 'LR', 0, 'L', 0);
-            $pdf->Cell(33, 10,  number_format($row['total_sale'], 2), 'LR', 0, 'R', 0);
-            $pdf->Cell(33, 10,  number_format($row['opening_stock'], 2), 'LR', 0, 'R', 0);
-            $pdf->Cell(33, 10,  number_format($row['total_purchase'], 2), 'LR', 0, 'R', 0);
-            $pdf->Cell(33, 10, number_format($row['closing_stock'], 2), 'LR', 0, 'R', 0);
-            $pdf->Cell(33, 10, number_format($row['cogs'], 2), 'LR', 0, 'R', 0);
-            $pdf->Cell(33, 10, number_format($row['gross_profit'], 2), 'LR', 0, 'R', 0);
-            $pdf->Ln(10);
-    
-            // Sum totals
-            $total_sales += $row['total_sale'];
-            $total_opening += $row['opening_stock'];
-            $total_purchase += $row['total_purchase'];
-            $total_closing += $row['closing_stock'];
-            $total_cogs += $row['cogs'];
+
+            $pdf->SetFont('helvetica', '', 7.5);
+            $pdf->SetDrawColor(203, 213, 225);
+            if ($fill) { $pdf->SetFillColor(248, 250, 252); } else { $pdf->SetFillColor(255, 255, 255); }
+
+            $catLabel = ($category === $row['category_name']) ? '' : $row['category_name'];
+            $category = $row['category_name'];
+
+            $pdf->Cell($c[0], $lh, $catLabel,                                   1, 0, 'L', true);
+            $pdf->Cell($c[1], $lh, $row['product_name'],                         1, 0, 'L', true);
+            $pdf->Cell($c[2], $lh, number_format($row['total_sale'], 2),         1, 0, 'R', true);
+            $pdf->Cell($c[3], $lh, number_format($row['opening_stock'], 2),      1, 0, 'R', true);
+            $pdf->Cell($c[4], $lh, number_format($row['total_purchase'], 2),     1, 0, 'R', true);
+            $pdf->Cell($c[5], $lh, number_format($row['closing_stock'], 2),      1, 0, 'R', true);
+            $pdf->Cell($c[6], $lh, number_format($row['cogs'], 2),               1, 0, 'R', true);
+            $pdf->Cell($c[7], $lh, number_format($row['gross_profit'], 2),       1, 1, 'R', true);
+
+            $total_sales        += $row['total_sale'];
+            $total_opening      += $row['opening_stock'];
+            $total_purchase     += $row['total_purchase'];
+            $total_closing      += $row['closing_stock'];
+            $total_cogs         += $row['cogs'];
             $total_gross_profit += $row['gross_profit'];
+            $fill = !$fill;
         }
-    
-        // Print totals row
-        $pdf->SetFont('', 'B', 12);
-        $pdf->Cell(80, 10, "Total Amount:", 'TBLR', 0, 'L', 0); // 40+40
-        $pdf->Cell(33, 10, number_format($total_sales, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Cell(33, 10, number_format($total_opening, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Cell(33, 10, number_format($total_purchase, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Cell(33, 10, number_format($total_closing, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Cell(33, 10, number_format($total_cogs, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Cell(33, 10, number_format($total_gross_profit, 2), 'TBLR', 0, 'R', 0);
-        $pdf->Ln();
-    
-        $date = date('Y-m-d');
-        $filename = "Service Report_$date.pdf";
+
+        // ── Total row (green) ──
+        $pdf->SetFont('helvetica', 'B', 8);
+        $pdf->SetFillColor(220, 252, 231);
+        $pdf->SetTextColor(22, 101, 52);
+        $pdf->SetDrawColor(134, 239, 172);
+        $pdf->Cell($c[0]+$c[1], $lh, 'TOTAL',                               1, 0, 'R', true);
+        $pdf->Cell($c[2],       $lh, number_format($total_sales, 2),         1, 0, 'R', true);
+        $pdf->Cell($c[3],       $lh, number_format($total_opening, 2),       1, 0, 'R', true);
+        $pdf->Cell($c[4],       $lh, number_format($total_purchase, 2),      1, 0, 'R', true);
+        $pdf->Cell($c[5],       $lh, number_format($total_closing, 2),       1, 0, 'R', true);
+        $pdf->Cell($c[6],       $lh, number_format($total_cogs, 2),          1, 0, 'R', true);
+        $pdf->Cell($c[7],       $lh, number_format($total_gross_profit, 2),  1, 1, 'R', true);
+
+        $date     = date('Y-m-d');
+        $filename = "Gross_Profit_Category_Report_$date.pdf";
         $pdf->Output($filename, 'I');
+        exit;
     }
 
     public function bdtask_service_order_report()
