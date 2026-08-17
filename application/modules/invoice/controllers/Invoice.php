@@ -5717,4 +5717,20 @@ AES_DECRYPT(sd.quantity, '{$encryption_key}') AS quantity
     {
         echo $this->_build_sales_return_print($this->input->post('id', TRUE));
     }
+
+    public function getProductByNameStock()
+     {
+         $this->db->select("po.product_name,po.id");
+         $this->db->from('product_information po');
+         $this->db->like('po.product_name', $this->input->post('product_name'));
+         $this->db->like('po.status', 1);
+         $this->db->where('po.stock', 1);
+         $this->db->limit(100);
+
+         $query = $this->db->get();
+
+         if ($query->num_rows() > 0) {
+             echo json_encode($query->result_array());
+         }
+     }
 }
