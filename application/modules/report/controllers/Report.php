@@ -2680,7 +2680,7 @@ ORDER BY createddate DESC
         $pdf->Ln(3);
 
         // Column widths (total = 277mm for A4 landscape with 10mm margins each side)
-        $cols    = [22, 28, 26, 32, 32, 22, 28, 28, 28, 28];
+        $cols    = [22, 28, 26, 32, 32, 27, 26, 26, 28, 28];
         $headers = ['Date', 'Scenario', 'Incident', 'Parent Voucher', 'Voucher No', 'Store',
                     'Actual Stock', 'Physical Stock', 'Actual Stock (Std.)', 'Physical Stock (Std.)'];
 
