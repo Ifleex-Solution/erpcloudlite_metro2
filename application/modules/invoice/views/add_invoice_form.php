@@ -3257,7 +3257,7 @@ echo "</script>";
                     clearDetails()
                     $("#save_add").show();
 
-                    pusherNotify('updated');
+                    // pusherNotify('updated');
                     alert("Invoice Details Updated Successfully")
                     if (type2 === "B") alert("You are using the TESTING ENVIRONMENT, but it is connected to the live database. Printing or executing this transaction may modify actual inventory counts. Testing materials and printouts are confidential and must remain within the organisation. Do not share them with external parties.");  /* __testing_guard_added__ */
                     printRawHtml(datas.details);
@@ -3300,7 +3300,7 @@ echo "</script>";
                     clearDetails()
                     $("#save_add").show();
 
-                    pusherNotify('created');
+                    // pusherNotify('created');
                     alert("Invoice Details saved Successfully")
                     if (type2 === "B") alert("You are using the TESTING ENVIRONMENT, but it is connected to the live database. Printing or executing this transaction may modify actual inventory counts. Testing materials and printouts are confidential and must remain within the organisation. Do not share them with external parties.");  /* __testing_guard_added__ */
                     printRawHtml(datas.details);
