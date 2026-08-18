@@ -164,9 +164,6 @@
                 </div>
 
                 <div class="report-btn-row">
-                    <button type="button" id="btn-excel" class="btn btn-success" onclick="onFilterButtonClick('excel')">
-                        <i class="fa fa-file-excel-o"></i> Generate Excel
-                    </button>
                     <button type="button" id="btn-pdf" class="btn btn-success" onclick="onFilterButtonClick('pdf')">
                         <i class="fa fa-file-pdf-o"></i> Generate PDF
                     </button>
