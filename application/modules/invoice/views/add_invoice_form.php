@@ -484,7 +484,7 @@
             box-sizing: border-box;
             font-size: 13px;
             font-weight: 600;
-            height: 60px !important;
+            height: 90px !important;
             text-align: right;
         }
 
@@ -1043,13 +1043,13 @@
                         <tfoot>
                             <tr>
 
-                                <td colspan="8" class="text-right vathidden"><b><?php echo display('total') ?>:</b></td>
-                                <td colspan="7" class="text-right vatshow"><b><?php echo display('total') ?>:</b></td>
+                                <td colspan="8" class="text-right vathidden" style="padding-top:19px;padding-bottom:21px;"><b><?php echo display('total') ?>:</b></td>
+                                <td colspan="7" class="text-right vatshow" style="padding-top:19px;padding-bottom:21px;"><b><?php echo display('total') ?>:</b></td>
 
-                                <td class="text-right">
+                                <td class="text-right" style="padding-top:19px;padding-bottom:21px;">
                                     <input type="text" id="Total" class="text-right form-control" name="total" value="0.00" readonly="readonly" />
                                 </td>
-                                <td> <button type="button" id="add_invoice_item" class="btn btn-info" name="add-invoice-item"
+                                <td style="padding-top:19px;padding-bottom:21px;"> <button type="button" id="add_invoice_item" class="btn btn-info" name="add-invoice-item"
                                         onClick="addInputField('addinvoiceItem');" tabindex="9"><i class="fa fa-plus"></i></button>
 
                                     <input type="hidden" name="baseUrl" class="baseUrl" value="<?php echo base_url(); ?>" />
@@ -1068,8 +1068,8 @@
 
                                 </td>
                             </tr>
-                            <tr >
-                                <td colspan="8" class="text-right vathidden"><b><?php echo display('total_discount') ?>:</b></td>
+                            <tr style="display:none;">
+                                                                <td colspan="8" class="text-right vathidden"><b><?php echo display('total_discount') ?>:</b></td>
                                 <td colspan="7" class="text-right vatshow"><b><?php echo display('total_discount') ?>:</b></td>
 
 
@@ -1094,11 +1094,11 @@
 
 
                             <tr>
-                                <td colspan="8" class="text-right vathidden"><b><?php echo display('grand_total') ?>:</b></td>
-                                <td colspan="7" class="text-right vatshow"><b><?php echo display('grand_total') ?>:</b></td>
+                                <td colspan="8" class="text-right vathidden" style="padding-top:19px;padding-bottom:21px;"><b><?php echo display('grand_total') ?>:</b></td>
+                                <td colspan="7" class="text-right vatshow" style="padding-top:19px;padding-bottom:21px;"><b><?php echo display('grand_total') ?>:</b></td>
 
 
-                                <td class="text-right">
+                                <td class="text-right" style="padding-top:19px;padding-bottom:21px;">
                                     <input type="text" id="grandTotal" class="text-right form-control grandTotalamnt" name="grand_total_price" placeholder="0.00" value="00" readonly />
                                 </td>
                                 <td> </td>
