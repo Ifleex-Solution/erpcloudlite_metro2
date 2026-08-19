@@ -484,7 +484,7 @@
             box-sizing: border-box;
             font-size: 13px;
             font-weight: 600;
-            height: 34px !important;
+            height: 60px !important;
             text-align: right;
         }
 
@@ -1068,7 +1068,7 @@
 
                                 </td>
                             </tr>
-                            <tr style="display:none;">
+                            <tr >
                                 <td colspan="8" class="text-right vathidden"><b><?php echo display('total_discount') ?>:</b></td>
                                 <td colspan="7" class="text-right vatshow"><b><?php echo display('total_discount') ?>:</b></td>
 
